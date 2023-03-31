@@ -1,0 +1,33 @@
+name: Destroy
+
+on:
+  # destroy the environment at 10 pm if not destroyed already
+  schedule:
+    - cron: "0 22 * * *"
+  workflow_dispatch:
+
+jobs:
+  destroy_deployment:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.1.7
+
+      - uses: actions/checkout@v3
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-region: ap-south-1
+          role-to-assume: arn:aws:iam::890504605381:role/Deploy-with-OIDC
+          role-session-name: awssession
+          mask-aws-account-id: false
+
+      - run: terraform init
+        working-directory: cloud/aws
+
+      - name: Terraform Destroy
+        working-directory: cloud/aws
+        if: github.ref == 'refs/heads/main'
+        run: terraform destroy -auto-approve -input=false
