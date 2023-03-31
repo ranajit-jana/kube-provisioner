@@ -1,5 +1,5 @@
 # backend.hcl
-bucket         = "deployment-state-race-reva"
+bucket         = "deployment-env-state"
 region         = "ap-south-1"
 dynamodb_table = "deployment-state-race-reva-locks"
 encrypt        = true
