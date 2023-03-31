@@ -36,4 +36,4 @@ jobs:
       - name: Terraform Destroy
         working-directory: cloud/aws
         run: |
-          terraform destroy -backend-config=conf/deployment-backend.tfvars -auto-approve -input=false
+          terraform destroy -auto-approve -input=false

@@ -39,7 +39,7 @@ jobs:
 
       - id: plan
         working-directory: cloud/aws
-        run: terraform plan -no-color -backend-config=conf/deployment-backend.tfvars
+        run: terraform plan -no-color
 
       - name: Terraform Plan Status
         if: steps.plan.outcome == 'failure'
@@ -48,7 +48,7 @@ jobs:
       - name: Terraform Destroy
         working-directory: cloud/aws
         run: |
-          terraform apply -backend-config=conf/deployment-backend.tfvars workspace=deployment -auto-approve -input=false
+          terraform apply workspace=deployment -auto-approve -input=false
 
 
 
