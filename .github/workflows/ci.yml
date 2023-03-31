@@ -31,15 +31,18 @@ jobs:
         id: fmt
         run: terraform fmt -check
 
+      - run: cp conf/deployment-variables.tfvars deployment.tfvars
+        working-directory: cloud/aws
+
       - name: Terraform Init
         working-directory: cloud/aws
         id: init
-        run: terraform init
+      - run: terraform init -backend-config=conf/deployment-backend.tfvars workspace=deployment
 
       - name: Terraform Validate
         working-directory: cloud/aws
         id: validate
-        run: terraform validate -no-color
+        run: terraform validate -no-color -backend-config=conf/deployment-backend.tfvars workspace=deployment
 
       - name: Run Terrascan
         id: terrascan
