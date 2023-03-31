@@ -31,11 +31,6 @@ jobs:
         id: fmt
         run: terraform fmt -check
 
-      - run: |
-          cp conf/deployment-variables.tfvars deployment.tfvars
-          terraform workspace new deployment
-        working-directory: cloud/aws
-
       - name: Terraform Init
         working-directory: cloud/aws
         id: init
