@@ -9,6 +9,7 @@ on:
 jobs:
   destroy_deployment:
     runs-on: ubuntu-latest
+    environment: deployment
     steps:
       - uses: hashicorp/setup-terraform@v2
         with:
