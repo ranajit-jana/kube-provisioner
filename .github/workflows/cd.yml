@@ -34,7 +34,7 @@ jobs:
         working-directory: cloud/aws
 
       - run: |
-          terraform workspace new deployment
+          terraform workspace new deployment -backend-config=conf/deployment-backend.tfvars
         working-directory: cloud/aws
       - run: |
           cp conf/deployment-variables.tfvars deployment.tfvars
@@ -53,6 +53,5 @@ jobs:
         run: |
           terraform apply -backend-config=conf/deployment-backend.tfvars workspace=deployment -auto-approve -input=false
           terraform workspace select default
-          terraform workspace delete deployment
 
 
