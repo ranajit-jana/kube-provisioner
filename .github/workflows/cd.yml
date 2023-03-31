@@ -37,13 +37,6 @@ jobs:
         working-directory: cloud/aws
         run: terraform plan -no-color
 
-      - run: echo ${{ steps.plan.outputs.stdout }}
-        working-directory: cloud/aws
-      - run: echo ${{ steps.plan.outputs.stderr }}
-        working-directory: cloud/aws
-      - run: echo ${{ steps.plan.outputs.exitcode }}
-        working-directory: cloud/aws
-
       - name: Terraform Plan Status
         if: steps.plan.outcome == 'failure'
         run: exit 1
