@@ -30,12 +30,12 @@ jobs:
           role-session-name: awssession
           mask-aws-account-id: false
 
-      - run: terraform init
+      - run: terraform init -backend-config=conf/deployment-backend.tfvars
         working-directory: cloud/aws
 
       - id: plan
         working-directory: cloud/aws
-        run: terraform plan -no-color
+        run: terraform plan -no-color -backend-config=conf/deployment-backend.tfvars workspace=deployment 
 
       - name: Terraform Plan Status
         if: steps.plan.outcome == 'failure'
@@ -43,4 +43,4 @@ jobs:
 
       - name: Terraform Apply
         working-directory: cloud/aws
-        run: terraform apply -auto-approve -input=false
+        run: terraform apply -backend-config=conf/deployment-backend.tfvars workspace=deployment -auto-approve -input=false
