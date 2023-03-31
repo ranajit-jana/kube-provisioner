@@ -32,15 +32,17 @@ jobs:
 
 
 
-      - run: cp conf/deployment-variables.tfvars deployment.tfvars
+      - run: |
+          cp conf/deployment-variables.tfvars deployment.tfvars
+          terraform workspace new deployment
         working-directory: cloud/aws
 
-      - run: terraform init -backend-config=conf/deployment-backend.tfvars workspace=deployment
+      - run: terraform init -backend-config=conf/deployment-backend.tfvars
         working-directory: cloud/aws
 
       - id: plan
         working-directory: cloud/aws
-        run: terraform plan -no-color -backend-config=conf/deployment-backend.tfvars workspace=deployment 
+        run: terraform plan -no-color -backend-config=conf/deployment-backend.tfvars
 
       - name: Terraform Plan Status
         if: steps.plan.outcome == 'failure'
@@ -48,5 +50,9 @@ jobs:
 
       - name: Terraform Destroy
         working-directory: cloud/aws
-        run: terraform apply -backend-config=conf/deployment-backend.tfvars workspace=deployment -auto-approve -input=false
+        run: |
+          terraform apply -backend-config=conf/deployment-backend.tfvars workspace=deployment -auto-approve -input=false
+          terraform workspace select default
+          terraform workspace delete deployment
+
 
