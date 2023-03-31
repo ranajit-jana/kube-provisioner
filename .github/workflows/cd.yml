@@ -30,7 +30,6 @@ jobs:
           role-session-name: awssession
           mask-aws-account-id: false
 
-
       - run: terraform init -backend-config=conf/deployment-backend.tfvars
         working-directory: cloud/aws
 
