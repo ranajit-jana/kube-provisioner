@@ -31,9 +31,12 @@ jobs:
           mask-aws-account-id: false
 
       - run: terraform init
+        working-directory: cloud/aws
 
       - id: plan
+        working-directory: cloud/aws
         run: terraform plan -no-color
+
       - run: echo ${{ steps.plan.outputs.stdout }}
       - run: echo ${{ steps.plan.outputs.stderr }}
       - run: echo ${{ steps.plan.outputs.exitcode }}
@@ -44,4 +47,5 @@ jobs:
 
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main'
+        working-directory: cloud/aws
         run: terraform apply -auto-approve -input=false
