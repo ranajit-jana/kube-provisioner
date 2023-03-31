@@ -6,7 +6,7 @@ module "eks" {
   cluster_name    = "race-reva"
   cluster_version = "1.24"
 
-  cluster_endpoint_public_access  = true
+  cluster_endpoint_public_access = true
 
   cluster_addons = {
     coredns = {
@@ -20,8 +20,8 @@ module "eks" {
     }
   }
 
-  vpc_id                   = "vpc-0aa863f04f42d7a17"
-  subnet_ids               = ["subnet-06d71bcd8eab5d7cc", "subnet-0016baaa1ad983d1d", "subnet-07c713ac6f9a1f780"]
+  vpc_id     = "vpc-0aa863f04f42d7a17"
+  subnet_ids = ["subnet-06d71bcd8eab5d7cc", "subnet-0016baaa1ad983d1d", "subnet-07c713ac6f9a1f780"]
 
   tags = {
     Environment = "deployment"
