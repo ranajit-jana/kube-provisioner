@@ -37,7 +37,7 @@ jobs:
       - name: Terraform Init
         working-directory: cloud/aws
         id: init
-      - run: terraform init -backend-config=conf/deployment-backend.tfvars workspace=deployment
+        run: terraform init -backend-config=conf/deployment-backend.tfvars workspace=deployment
 
       - name: Terraform Validate
         working-directory: cloud/aws
