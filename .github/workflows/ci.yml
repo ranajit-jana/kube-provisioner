@@ -30,7 +30,6 @@ jobs:
         working-directory: cloud/aws
         id: fmt
         run: terraform fmt -check
-        continue-on-error: true
 
       - name: Terraform Init
         working-directory: cloud/aws
