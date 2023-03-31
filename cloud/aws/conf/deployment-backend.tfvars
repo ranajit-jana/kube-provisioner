@@ -1,6 +1,6 @@
 # backend.hcl
-bucket         = "terraform-up-and-running-state"
+bucket         = "deployment-state-race-reva"
 region         = "ap-south-1"
-dynamodb_table = "terraform-up-and-running-locks"
+dynamodb_table = "deployment-state-race-reva-locks"
 encrypt        = true
 key            = "deployment/kube-provisioner.tfstate"
