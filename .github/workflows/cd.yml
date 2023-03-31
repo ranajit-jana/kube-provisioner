@@ -32,12 +32,14 @@ jobs:
 
 
 
+
+
+      - run: terraform init -backend-config=conf/deployment-backend.tfvars
+        working-directory: cloud/aws
+
       - run: |
           cp conf/deployment-variables.tfvars deployment.tfvars
           terraform workspace new deployment
-        working-directory: cloud/aws
-
-      - run: terraform init -backend-config=conf/deployment-backend.tfvars
         working-directory: cloud/aws
 
       - id: plan
