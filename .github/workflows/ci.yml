@@ -5,7 +5,7 @@ name: CI
 # Controls when the workflow will run
 on:
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -19,14 +19,35 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
+      - uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.1.7
+
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
+
+      - name: Terraform fmt
+        working-directory: cloud/aws
+        id: fmt
+        run: terraform fmt -check
+        continue-on-error: true
+
+      - name: Terraform Init
+        working-directory: cloud/aws
+        id: init
+        run: terraform init
+
+      - name: Terraform Validate
+        working-directory: cloud/aws
+        id: validate
+        run: terraform validate -no-color
 
       - name: Run Terrascan
         id: terrascan
         uses: tenable/terrascan-action@main
         with:
-          iac_type: 'terraform'
-          iac_version: 'v14'
-          policy_type: 'aws'
+          iac_type: "terraform"
+          iac_version: "v14"
+          policy_type: "aws"
           only_warn: true
+          iac_dir: cloud/aws

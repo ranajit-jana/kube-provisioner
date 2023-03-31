@@ -1,0 +1,47 @@
+name: Deploy
+
+on:
+  pull_request:
+    types:
+      - closed
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deployment:
+    if: github.event.pull_request.merged == true
+    environment: deployment
+    runs-on: ubuntu-latest
+    steps:
+      - uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.1.7
+
+      - uses: actions/checkout@v3
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-region: ap-south-1
+          role-to-assume: arn:aws:iam::890504605381:role/Deploy-with-OIDC
+          role-session-name: awssession
+          mask-aws-account-id: false
+
+      - run: terraform init
+
+      - id: plan
+        run: terraform plan -no-color
+      - run: echo ${{ steps.plan.outputs.stdout }}
+      - run: echo ${{ steps.plan.outputs.stderr }}
+      - run: echo ${{ steps.plan.outputs.exitcode }}
+
+      - name: Terraform Plan Status
+        if: steps.plan.outcome == 'failure'
+        run: exit 1
+
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main'
+        run: terraform apply -auto-approve -input=false
