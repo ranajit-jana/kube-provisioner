@@ -25,9 +25,17 @@ jobs:
           role-session-name: destroysession
           mask-aws-account-id: false
 
-      - run: terraform init
+      - run: |
+          cp conf/deployment-variables.tfvars deployment.tfvars
+          terraform workspace new deployment
+        working-directory: cloud/aws
+
+      - run: terraform init -backend-config=conf/deployment-backend.tfvars
         working-directory: cloud/aws
 
       - name: Terraform Destroy
         working-directory: cloud/aws
-        run: terraform destroy -auto-approve -input=false
+        run: |
+          terraform destroy -backend-config=conf/deployment-backend.tfvars -auto-approve -input=false
+          terraform workspace select default
+          terraform workspace delete deployment
