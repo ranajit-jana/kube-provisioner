@@ -21,7 +21,7 @@ jobs:
         with:
           aws-region: ap-south-1
           role-to-assume: arn:aws:iam::890504605381:role/Deploy-with-OIDC
-          role-session-name: destroysession
+          role-session-name: awssession
           mask-aws-account-id: false
 
 
