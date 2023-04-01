@@ -4,7 +4,7 @@ module "eks" {
   source  = "terraform-aws-modules/eks/aws"
   version = "~> 19.0"
 
-  cluster_name    = "race-reva"
+  cluster_name    = "race-capstone"
   cluster_version = "1.25"
 
   cluster_endpoint_public_access = true
