@@ -8,7 +8,7 @@ on:
 jobs:
   destroy_deployment:
     runs-on: ubuntu-latest
-    environment: deployment
+    environment: destroy
     steps:
       - uses: hashicorp/setup-terraform@v2
         with:
@@ -21,7 +21,7 @@ jobs:
         with:
           aws-region: ap-south-1
           role-to-assume: arn:aws:iam::890504605381:role/Deploy-with-OIDC
-          role-session-name: awssession
+          role-session-name: awsdestroy
           mask-aws-account-id: false
 
 
