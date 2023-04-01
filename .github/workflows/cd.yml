@@ -34,7 +34,7 @@ jobs:
         working-directory: cloud/aws
 
       - run: |
-          if [[ 'deployment' != $(terraform workspace show)]]; then
+          if [[ 'deployment' != $(terraform workspace show) ]]; then
             terraform workspace select deployment || terraform workspace new  deployment
           fi
         working-directory: cloud/aws
