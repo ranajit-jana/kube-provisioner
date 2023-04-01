@@ -42,3 +42,4 @@ jobs:
         working-directory: cloud/aws
         run: |
           terraform apply -destroy  -auto-approve -input=false destroy-deployment-${{ github.run_id }}.plan
+
