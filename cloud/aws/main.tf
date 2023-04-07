@@ -29,8 +29,8 @@ module "eks" {
     eks_node = {
       instance_types = ["t3a.medium"]
       min_size       = 1
-      max_size       = 1
-      desired_size   = 1
+      max_size       = 4
+      desired_size   = 2
     }
   }
 
