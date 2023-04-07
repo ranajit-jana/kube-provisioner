@@ -31,6 +31,9 @@ module "eks" {
       min_size       = var.node_group_min_size
       max_size       = var.node_group_max_size
       desired_size   = var.node_group_desired_size
+      k8s_labels = {
+        network = "private"
+      }
     }
   }
 
