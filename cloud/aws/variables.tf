@@ -25,3 +25,8 @@ variable "node_group_instance_types" {
   description = "ec2 instance type"
 
 }
+
+variable "vpc_id" {
+  type = string
+}
+
