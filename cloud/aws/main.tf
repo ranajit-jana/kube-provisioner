@@ -27,10 +27,10 @@ module "eks" {
 
   eks_managed_node_groups = {
     eks_node = {
-      instance_types = ["t3a.medium"]
-      min_size       = 1
-      max_size       = 1
-      desired_size   = 1
+      instance_types = var.node_group_instance_types
+      min_size       = var.node_group_min_size
+      max_size       = var.node_group_max_size
+      desired_size   = var.node_group_desired_size
     }
   }
 
