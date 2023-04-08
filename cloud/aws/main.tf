@@ -34,6 +34,12 @@ module "eks" {
       k8s_labels = {
         network = "private"
       }
+       network_interfaces = [
+      {
+        associate_public_ip_address = false
+        delete_on_termination       = true
+      }
+    ]
     }
   }
 
