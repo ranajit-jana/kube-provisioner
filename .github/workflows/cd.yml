@@ -53,7 +53,7 @@ jobs:
         id: tf_deploy
         run: |
           terraform apply -auto-approve -input=false deployment-${{ github.run_id }}.plan
-          echo "cluster_name=$(terraform output cluster_name |  sed 's/^\'\"//' |sed 's/\"\'$//' )" >> "$GITHUB_OUTPUT"
+          echo "cluster_name=$(terraform output cluster_name |  tr -d '\"' | tr -d ''')" >> "$GITHUB_OUTPUT"
 
       - name: Setup helmfile
         uses: mamezou-tech/setup-helmfile@v1.2.0
