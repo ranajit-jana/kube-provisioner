@@ -6,5 +6,5 @@ echo "$current_branch"
 
 if [ "$1" != "" ]; then
     echo "create new branch"
-    git checkout -b "$current_branch"
+    it push --set-upstream origin "$current_branch"
 fi
