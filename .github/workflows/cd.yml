@@ -67,5 +67,6 @@ jobs:
       - name: Helm sync
         working-directory: helm/argocd-helmfile-deployment
         run: |
+          echo "kubeoutput : ${{ steps.tf_deploy.outputs.cluster_name }}"
           aws eks --region ap-south-1 update-kubeconfig --name ${{ steps.tf_deploy.outputs.cluster_name }}
           helmfile sync
