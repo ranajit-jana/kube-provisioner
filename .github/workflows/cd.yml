@@ -55,7 +55,7 @@ jobs:
           terraform apply -auto-approve -input=false deployment-${{ github.run_id }}.plan
           clustername="$( terraform output cluster_name )"
           echo "cluster name: $clustername"
-          echo "cluster_name=$(terraform output cluster_name |  tr '\n' ' ' | cut -d ' ' -f 1  | rev  )" >> $GITHUB_OUTPUT
+          echo "reva_cluster_name=$(terraform output cluster_name |  tr '\n' ' ' | cut -d ' ' -f 1  | rev  )" >> $GITHUB_OUTPUT
 
       - name: Setup helmfile
         uses: mamezou-tech/setup-helmfile@v1.2.0
@@ -69,6 +69,6 @@ jobs:
       - name: Helm sync
         working-directory: helm/argocd-helmfile-deployment
         run: |
-          echo "kubeoutput : ${{ steps.tf_deploy.outputs.cluster_name }}"
-          aws eks --region ap-south-1 update-kubeconfig --name ${{ steps.tf_deploy.outputs.cluster_name }}
+          echo "kubeoutput : ${{ steps.tf_deploy.outputs.reva_cluster_name }}"
+          aws eks --region ap-south-1 update-kubeconfig --name ${{ steps.tf_deploy.outputs.reva_cluster_name }}
           helmfile sync
