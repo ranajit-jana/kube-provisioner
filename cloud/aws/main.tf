@@ -4,8 +4,8 @@ module "eks" {
   source  = "terraform-aws-modules/eks/aws"
   version = "~> 19.0"
 
-  cluster_name    = "race-capstone"
-  cluster_version = "1.25"
+  cluster_name    = var.cluster_name
+  cluster_version = var.cluster_version
 
   cluster_endpoint_public_access = false
 
@@ -34,18 +34,18 @@ module "eks" {
       k8s_labels = {
         network = "private"
       }
-       network_interfaces = [
-      {
-        associate_public_ip_address = false
-        delete_on_termination       = true
-      }
-    ]
+      network_interfaces = [
+        {
+          associate_public_ip_address = false
+          delete_on_termination       = true
+        }
+      ]
     }
   }
 
 
-  vpc_id     = "vpc-0aa863f04f42d7a17"
-  subnet_ids = ["subnet-06d71bcd8eab5d7cc", "subnet-0016baaa1ad983d1d", "subnet-07c713ac6f9a1f780"]
+  vpc_id     = var.vpc_id
+  subnet_ids = var.subnet_ids
 
 
   tags = {

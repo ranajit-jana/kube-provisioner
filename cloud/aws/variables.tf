@@ -30,3 +30,17 @@ variable "vpc_id" {
   type = string
 }
 
+
+variable "subnet_ids" {
+  type = string
+}
+
+
+variable "cluster_version" {
+  type = string
+}
+
+
+variable "cluster_name" {
+  type = string
+}
