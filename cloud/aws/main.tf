@@ -34,7 +34,7 @@ module "eks" {
     }
   }
 
-aws_auth_users = [
+  aws_auth_users = [
     {
       userarn  = "arn:aws:iam::890504605381:user/terraformrunner"
       username = "terraformrunner"
