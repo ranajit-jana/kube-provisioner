@@ -41,7 +41,7 @@ module "eks" {
 
   aws_auth_roles = [
     {
-      rolearn  = module.eks_managed_node_group.iam_role_arn
+      rolearn  = eks_managed_node_group.iam_role_arn
       username = "system:node:{{EC2PrivateDNSName}}"
       groups = [
         "system:bootstrappers",
