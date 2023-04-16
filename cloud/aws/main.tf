@@ -104,3 +104,13 @@ module "eks_managed_node_group" {
 
   tags = merge(local.tags, { Separate = "eks-managed-node-group" })
 }
+
+
+locals {
+  region = "ap-south-1"
+
+  tags = {
+    GithubRepo = "kube-provisioner"
+    GithubOrg  = "ranajit-jana"
+  }
+}
