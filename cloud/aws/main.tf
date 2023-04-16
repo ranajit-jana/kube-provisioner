@@ -60,15 +60,6 @@ module "eks" {
         "system:bootstrappers",
         "system:nodes",
       ]
-    },
-    {
-      rolearn  = module.fargate_profile.fargate_profile_pod_execution_role_arn
-      username = "system:node:{{SessionName}}"
-      groups = [
-        "system:bootstrappers",
-        "system:nodes",
-        "system:node-proxier",
-      ]
     }
   ]
 
