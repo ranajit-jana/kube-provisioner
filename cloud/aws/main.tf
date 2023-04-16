@@ -34,6 +34,13 @@ module "eks" {
     }
   }
 
+aws_auth_users = [
+    {
+      userarn  = "arn:aws:iam::890504605381:user/terraformrunner"
+      username = "terraformrunner"
+      groups   = ["system:masters"]
+    },
+  ]
 
   vpc_id     = var.vpc_id
   subnet_ids = var.subnet_ids
