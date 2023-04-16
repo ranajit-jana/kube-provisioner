@@ -1,0 +1,15 @@
+apiVersion: batch/v1
+kind: Job
+name: kube-hunter-{{ include "aquasecurity.fullname" . }}
+spec:
+  template:
+    metadata:
+      labels:
+        app: kube-hunter
+    spec:
+      containers:
+      - name: kube-hunter
+        image: aquasec/kube-hunter:0.6.8
+        command: ["kube-hunter"]
+        args: ["--pod"]
+      restartPolicy: Never

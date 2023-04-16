@@ -12,6 +12,9 @@
   },
   "postStartCommand": "post-start",
   "settings": {},
-  "extensions": ["hashicorp.terraform"],
+  "extensions": [
+	"hashicorp.terraform",
+	"extactcom.gfe---good-for-eyes"
+],
   "remoteUser": "vscode"
 }
