@@ -42,6 +42,10 @@ module "eks" {
     },
   ]
 
+  aws_auth_accounts = [
+    "890504605381",
+  ]
+
   vpc_id     = var.vpc_id
   subnet_ids = var.subnet_ids
 
