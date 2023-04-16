@@ -61,14 +61,9 @@ jobs:
       - name: Setup helmfile
         uses: mamezou-tech/setup-helmfile@v1.2.0
 
-      - name: Test
-        run: |
-          helmfile --version
-          helm version
-          kubectl version --client
 
       - name: Helm sync
-        working-directory: helm/argocd-helmfile-deployment
+        working-directory: helm
         run: |
           echo "kubeoutput : ${{ steps.tf_deploy.outputs.reva_cluster_name }}"
           aws eks --region ap-south-1 update-kubeconfig --name ${{ steps.tf_deploy.outputs.reva_cluster_name }}
