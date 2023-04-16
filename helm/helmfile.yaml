@@ -42,6 +42,6 @@ releases:
 
 - name: aquasecurity
   namespace: audit
-  chart: ../aquasecurity
+  chart: ./aquasecurity
   values:
   - ./values/aquasecurity.yaml
