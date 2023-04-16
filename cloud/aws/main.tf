@@ -34,6 +34,47 @@ module "eks" {
     }
   }
 
+
+
+  manage_aws_auth_configmap = true
+
+  aws_auth_node_iam_role_arns_non_windows = [
+    module.eks_managed_node_group.iam_role_arn,
+    module.self_managed_node_group.iam_role_arn,
+  ]
+  aws_auth_fargate_profile_pod_execution_role_arns = [
+    module.fargate_profile.fargate_profile_pod_execution_role_arn
+  ]
+
+  aws_auth_roles = [
+    {
+      rolearn  = module.eks_managed_node_group.iam_role_arn
+      username = "system:node:{{EC2PrivateDNSName}}"
+      groups = [
+        "system:bootstrappers",
+        "system:nodes",
+      ]
+    },
+    {
+      rolearn  = module.self_managed_node_group.iam_role_arn
+      username = "system:node:{{EC2PrivateDNSName}}"
+      groups = [
+        "system:bootstrappers",
+        "system:nodes",
+      ]
+    },
+    {
+      rolearn  = module.fargate_profile.fargate_profile_pod_execution_role_arn
+      username = "system:node:{{SessionName}}"
+      groups = [
+        "system:bootstrappers",
+        "system:nodes",
+        "system:node-proxier",
+      ]
+    }
+  ]
+
+
   aws_auth_users = [
     {
       userarn  = "arn:aws:iam::890504605381:user/terraformrunner"
