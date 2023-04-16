@@ -83,7 +83,7 @@ module "eks_managed_node_group" {
   cluster_name    = module.eks.cluster_name
   cluster_version = module.eks.cluster_version
 
-  subnet_ids                        = module.vpc.private_subnets
+  subnet_ids                        = var.subnet_ids
   cluster_primary_security_group_id = module.eks.cluster_primary_security_group_id
   vpc_security_group_ids = [
     module.eks.cluster_security_group_id,
