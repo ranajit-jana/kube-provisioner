@@ -152,6 +152,16 @@ module "eks_managed_node_group" {
   cluster_name    = module.eks.cluster_name
   cluster_version = module.eks.cluster_version
 
+  min_size     = var.node_group_min_size
+  max_size     = var.node_group_max_size
+  desired_size = var.node_group_desired_size
+
+
+
+  instance_types = ["t3.large"]
+  capacity_type  = "SPOT"
+
+
   subnet_ids                        = var.subnet_ids
   cluster_primary_security_group_id = module.eks.cluster_primary_security_group_id
   vpc_security_group_ids = [
@@ -196,4 +206,4 @@ resource "aws_iam_role_policy_attachment" "ng_cni" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
   role       = module.eks_managed_node_group.iam_role_arn
 }
- 
+
