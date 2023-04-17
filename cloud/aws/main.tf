@@ -7,7 +7,12 @@ module "eks" {
   cluster_name    = var.cluster_name
   cluster_version = var.cluster_version
 
-  cluster_endpoint_public_access = true
+
+  vpc_id     = var.vpc_id
+  subnet_ids = var.subnet_ids
+
+  cluster_endpoint_public_access  = true
+  cluster_endpoint_private_access = true
 
 
   cluster_addons = {
@@ -34,37 +39,51 @@ module "eks" {
     }
   }
 
-
-
-  manage_aws_auth_configmap = true
-
-
-  aws_auth_roles = [
-    {
-      rolearn  = module.eks_managed_node_group.iam_role_arn
-      username = "system:node:{{EC2PrivateDNSName}}"
-      groups = [
-        "system:bootstrappers",
-        "system:nodes",
-      ]
+  # Extend cluster security group rules
+  cluster_security_group_additional_rules = {
+    egress_nodes_ephemeral_ports_tcp = {
+      description                = "To node 1025-65535"
+      protocol                   = "tcp"
+      from_port                  = 1025
+      to_port                    = 65535
+      type                       = "egress"
+      source_node_security_group = true
     }
-  ]
+  }
+
+  # Extend node-to-node security group rules
+  node_security_group_additional_rules = {
+    ingress_self_all = {
+      description = "Node to node all ports/protocols"
+      protocol    = "-1"
+      from_port   = 0
+      to_port     = 0
+      type        = "ingress"
+      self        = true
+    }
+    egress_all = {
+      description      = "Node all egress"
+      protocol         = "-1"
+      from_port        = 0
+      to_port          = 0
+      type             = "egress"
+      cidr_blocks      = ["0.0.0.0/0"]
+      ipv6_cidr_blocks = ["::/0"]
+    }
+    ingress_cluster_all = {
+      description                = "Acess from control plane"
+      protocol                   = "-1"
+      from_port                  = 0
+      to_port                    = 0
+      type                       = "ingress"
+      source_node_security_group = true
+    }
+  }
+
+  #managed from outside
+  manage_aws_auth_configmap = false
 
 
-  aws_auth_users = [
-    {
-      userarn  = "arn:aws:iam::890504605381:user/terraformrunner"
-      username = "terraformrunner"
-      groups   = ["system:masters"]
-    },
-  ]
-
-  aws_auth_accounts = [
-    "890504605381",
-  ]
-
-  vpc_id     = var.vpc_id
-  subnet_ids = var.subnet_ids
 
 
   tags = {
@@ -75,6 +94,48 @@ module "eks" {
 
 
 }
+
+
+resource "kubernetes_config_map" "aws_auth" {
+
+  metadata {
+    name      = "aws-auth"
+    namespace = "kube-system"
+  }
+
+  data = {
+    "mapAccounts" = yamlencode([])
+    "mapRoles" = yamlencode([
+      {
+        rolearn  = module.eks_managed_node_group.iam_role_arn
+        username = "system:node:{{EC2PrivateDNSName}}"
+        groups = [
+          "system:bootstrappers",
+          "system:nodes",
+        ]
+      },
+      {
+        rolearn  = "arn:aws:iam::890504605381:user/terraformrunner"
+        username = "terraformrunner"
+        groups   = ["system:masters"]
+      }
+
+    ])
+    "mapUsers" = yamlencode([])
+  }
+
+  lifecycle {
+    # We are ignoring the data here since we will manage it with the resource below
+    # This is only intended to be used in scenarios where the configmap does not exist
+    ignore_changes = [data, metadata[0].labels, metadata[0].annotations]
+  }
+
+  depends_on = [
+    module.eks, module.eks_managed_node_group
+  ]
+}
+
+
 
 module "eks_managed_node_group" {
   source = "terraform-aws-modules/eks/aws//modules/eks-managed-node-group"
@@ -103,60 +164,8 @@ module "eks_managed_node_group" {
   EOT
 
   tags = merge(local.tags, { Separate = "eks-managed-node-group" })
-}
-
-
-locals {
-  region = "ap-south-1"
-
-  tags = {
-    GithubRepo = "kube-provisioner"
-    GithubOrg  = "ranajit-jana"
-  }
-
-  aws_auth_configmap_data = {
-    mapRoles =  yamlencode ({
-        rolearn  = module.eks_managed_node_group.iam_role_arn
-        username = "system:node:{{EC2PrivateDNSName}}"
-        groups = [
-          "system:bootstrappers",
-          "system:nodes",
-        ]
-        })
-  }
-
-}
-
-
-resource "kubernetes_config_map_v1_data" "aws_auth" {
-
-  force = true
-
-  metadata {
-    name      = "aws-auth"
-    namespace = "kube-system"
-  }
-
-  data = local.aws_auth_configmap_data
 
   depends_on = [
-    # Required for instances where the configmap does not exist yet to avoid race condition
-    kubernetes_config_map.aws_auth,
+    module.eks
   ]
-}
-
-resource "kubernetes_config_map" "aws_auth" {
-
-  metadata {
-    name      = "aws-auth"
-    namespace = "kube-system"
-  }
-
-  data = local.aws_auth_configmap_data
-
-  lifecycle {
-    # We are ignoring the data here since we will manage it with the resource below
-    # This is only intended to be used in scenarios where the configmap does not exist
-    ignore_changes = [data, metadata[0].labels, metadata[0].annotations]
-  }
 }
