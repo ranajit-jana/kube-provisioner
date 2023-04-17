@@ -1,4 +1,12 @@
 
+locals {
+  region = "ap-south-1"
+
+  tags = {
+    GithubRepo = "kube-provisioner"
+    GithubOrg  = "ranajit-jana"
+  }
+}
 
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
