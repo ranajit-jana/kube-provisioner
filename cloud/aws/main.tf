@@ -79,7 +79,20 @@ module "eks" {
     Terraform   = "true"
   }
 
-
+  cluster_addons = {
+    coredns = {
+      most_recent       = true
+      resolve_conflicts = "OVERWRITE"
+    }
+    kube-proxy = {
+      most_recent       = true
+      resolve_conflicts = "OVERWRITE"
+    }
+    vpc-cni = {
+      most_recent       = true
+      resolve_conflicts = "OVERWRITE"
+    }
+  }
 
 }
 
@@ -123,24 +136,6 @@ resource "kubernetes_config_map" "aws_auth" {
   ]
 }
 
-resource "aws_eks_addon" "coredns" {
-  addon_name        = "coredns"
-  cluster_name      = var.cluster_name
-  resolve_conflicts = "OVERWRITE"
-  depends_on = [
-    module.eks_managed_node_group
-  ]
-}
-
-resource "aws_eks_addon" "kubeproxy" {
-  addon_name        = "kube-proxy"
-  cluster_name      = var.cluster_name
-  resolve_conflicts = "OVERWRITE"
-  depends_on = [
-    module.eks_managed_node_group
-  ]
-
-}
 
 module "eks_managed_node_group" {
   source = "terraform-aws-modules/eks/aws//modules/eks-managed-node-group"
