@@ -26,7 +26,7 @@ module "eks" {
   kms_key_enable_default_policy        = var.kms_key_enable_default_policy
 
 
-  kms_key_administratorys = var.access_role
+  kms_key_administrators = var.access_role
 
   create_cni_ipv6_iam_policy = false
 
