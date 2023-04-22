@@ -44,3 +44,22 @@ variable "cluster_version" {
 variable "cluster_name" {
   type = string
 }
+
+
+variable "cluster_endpoint_public_access_cidrs" {
+
+  type        = list(string)
+  description = "cluster_endpoint_public_access_cidrs"
+
+}
+
+variable "cluster_endpoint_public_access" {
+}
+variable "cluster_endpoint_private_access" {
+}
+variable "create_kms_key" {
+}
+variable "kms_key_enable_default_policy" {
+}
+variable "access_role" {
+}
