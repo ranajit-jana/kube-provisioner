@@ -25,9 +25,6 @@ module "eks" {
   create_kms_key                       = var.create_kms_key
   kms_key_enable_default_policy        = var.kms_key_enable_default_policy
 
-
-  kms_key_administrators = var.access_role
-
   create_cni_ipv6_iam_policy = false
 
   # Extend cluster security group rules
