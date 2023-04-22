@@ -97,6 +97,13 @@ module "eks" {
     }
   }
 
+  # OIDC Identity provider
+  cluster_identity_providers = {
+    sts = {
+      client_id = "sts.amazonaws.com"
+    }
+  }
+
 }
 
 
@@ -194,12 +201,7 @@ module "eks_managed_node_group" {
   tags = merge(local.tags, { Separate = "eks-managed-node-group" })
 
 
-  # OIDC Identity provider
-  cluster_identity_providers = {
-    sts = {
-      client_id = "sts.amazonaws.com"
-    }
-  }
+
 
 
   depends_on = [
