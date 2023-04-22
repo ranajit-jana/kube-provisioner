@@ -92,6 +92,9 @@ module "eks" {
       most_recent       = true
       resolve_conflicts = "OVERWRITE"
     }
+    aws-ebs-csi-driver = {
+      service_account_role_arn = module.ebs_csi_irsa_role.iam_role_arn
+    }
   }
 
 }
@@ -137,6 +140,21 @@ resource "kubernetes_config_map" "aws_auth" {
 }
 
 
+module "ebs_csi_irsa_role" {
+  source = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
+
+  role_name = "${var.cluster_name}-AmazonEKS_EBS_CSI_DriverRole"
+
+  attach_ebs_csi_policy = true
+  oidc_providers = {
+    main = {
+      provider_arn               = module.eks.oidc_provider_arn
+      namespace_service_accounts = ["kube-system:ebs-csi-controller-sa"]
+    }
+  }
+
+}
+
 module "eks_managed_node_group" {
   source = "terraform-aws-modules/eks/aws//modules/eks-managed-node-group"
 
@@ -175,11 +193,18 @@ module "eks_managed_node_group" {
 
   tags = merge(local.tags, { Separate = "eks-managed-node-group" })
 
+
+  # OIDC Identity provider
+  cluster_identity_providers = {
+    sts = {
+      client_id = "sts.amazonaws.com"
+    }
+  }
+
+
   depends_on = [
     module.eks,
-    aws_iam_role_policy_attachment.ng_worker,
-    aws_iam_role_policy_attachment.ng_ecr,
-    aws_iam_role_policy_attachment.ng_cni,
+    kubernetes_config_map.aws_auth
   ]
 }
 
