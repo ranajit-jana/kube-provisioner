@@ -63,3 +63,6 @@ variable "kms_key_enable_default_policy" {
 }
 variable "access_role" {
 }
+
+variable "account_number" {
+}
