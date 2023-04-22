@@ -176,7 +176,10 @@ module "eks_managed_node_group" {
   tags = merge(local.tags, { Separate = "eks-managed-node-group" })
 
   depends_on = [
-    module.eks
+    module.eks,
+    aws_iam_role_policy_attachment.ng_worker,
+    aws_iam_role_policy_attachment.ng_ecr,
+    aws_iam_role_policy_attachment.ng_cni,
   ]
 }
 
