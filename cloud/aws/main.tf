@@ -161,209 +161,57 @@ module "ebs_csi_irsa_role" {
   }
 
 }
-
 module "eks_managed_node_group" {
   source = "terraform-aws-modules/eks/aws//modules/eks-managed-node-group"
-  # Default node group - as provided by AWS EKS
-  name            = "eks-managed-ng"
-  cluster_name    = module.eks.cluster_name
-  cluster_version = module.eks.cluster_version
-  default_node_group = {
-    # By default, the module creates a launch template to ensure tags are propagated to instances, etc.,
-    # so we need to disable it to use the default template provided by the AWS EKS managed node group service
-    use_custom_launch_template = false
 
-    disk_size = 50
+  name            = "separate-eks-mng"
+  cluster_name    = var.cluster_name
+  cluster_version = var.cluster_version
 
-    # Remote access cannot be specified with a launch template
-    remote_access = {
-      ec2_ssh_key               = module.key_pair.key_pair_name
-      source_security_group_ids = [aws_security_group.remote_access.id]
+  subnet_ids = var.subnet_ids
+
+  // The following variables are necessary if you decide to use the module outside of the parent EKS module context.
+  // Without it, the security groups of the nodes are empty and thus won't join the cluster.
+  cluster_primary_security_group_id = module.eks.cluster_primary_security_group_id
+  vpc_security_group_ids            = [module.eks.node_security_group_id]
+
+  // Note: `disk_size`, and `remote_access` can only be set when using the EKS managed node group default launch template
+  // This module defaults to providing a custom launch template to allow for custom security groups, tag propagation, etc.
+  // use_custom_launch_template = false
+  // disk_size = 50
+  //
+  //  # Remote access cannot be specified with a launch template
+  //  remote_access = {
+  //    ec2_ssh_key               = module.key_pair.key_pair_name
+  //    source_security_group_ids = [aws_security_group.remote_access.id]
+  //  }
+
+  min_size     = 1
+  max_size     = 10
+  desired_size = 1
+
+  instance_types = ["t3.large"]
+  capacity_type  = "SPOT"
+
+  labels = {
+    Environment = "test"
+    GithubRepo  = "terraform-aws-eks"
+    GithubOrg   = "terraform-aws-modules"
+  }
+
+  taints = {
+    dedicated = {
+      key    = "dedicated"
+      value  = "gpuGroup"
+      effect = "NO_SCHEDULE"
     }
   }
 
-  # Default node group - as provided by AWS EKS using Bottlerocket
-  bottlerocket_default = {
-    # By default, the module creates a launch template to ensure tags are propagated to instances, etc.,
-    # so we need to disable it to use the default template provided by the AWS EKS managed node group service
-    use_custom_launch_template = false
-
-    ami_type = "BOTTLEROCKET_x86_64"
-    platform = "bottlerocket"
+  tags = {
+    Environment = "dev"
+    Terraform   = "true"
   }
-
-  # Adds to the AWS provided user data
-  bottlerocket_add = {
-    ami_type = "BOTTLEROCKET_x86_64"
-    platform = "bottlerocket"
-
-    # This will get added to what AWS provides
-    bootstrap_extra_args = <<-EOT
-        # extra args added
-        [settings.kernel]
-        lockdown = "integrity"
-      EOT
-  }
-
-  # Custom AMI, using module provided bootstrap data
-  bottlerocket_custom = {
-    # Current bottlerocket AMI
-    ami_id   = data.aws_ami.eks_default_bottlerocket.image_id
-    platform = "bottlerocket"
-
-    # Use module user data template to bootstrap
-    enable_bootstrap_user_data = true
-    # This will get added to the template
-    bootstrap_extra_args = <<-EOT
-        # The admin host container provides SSH access and runs with "superpowers".
-        # It is disabled by default, but can be disabled explicitly.
-        [settings.host-containers.admin]
-        enabled = false
-        # The control host container provides out-of-band access via SSM.
-        # It is enabled by default, and can be disabled if you do not expect to use SSM.
-        # This could leave you with no way to access the API and change settings on an existing node!
-        [settings.host-containers.control]
-        enabled = true
-        # extra args added
-        [settings.kernel]
-        lockdown = "integrity"
-        [settings.kubernetes.node-labels]
-        label1 = "foo"
-        label2 = "bar"
-        [settings.kubernetes.node-taints]
-        dedicated = "experimental:PreferNoSchedule"
-        special = "true:NoSchedule"
-      EOT
-  }
-
-  # Use a custom AMI
-  custom_ami = {
-    ami_type = "AL2_ARM_64"
-    # Current default AMI used by managed node groups - pseudo "custom"
-    ami_id = data.aws_ami.eks_default_arm.image_id
-
-    # This will ensure the bootstrap user data is used to join the node
-    # By default, EKS managed node groups will not append bootstrap script;
-    # this adds it back in using the default template provided by the module
-    # Note: this assumes the AMI provided is an EKS optimized AMI derivative
-    enable_bootstrap_user_data = true
-
-    instance_types = ["t4g.medium"]
-  }
-
-  # Complete
-  complete = {
-    name            = "complete-eks-mng"
-    use_name_prefix = true
-
-    subnet_ids = module.vpc.private_subnets
-
-    min_size     = var.node_group_min_size
-    max_size     = var.node_group_max_size
-    desired_size = var.node_group_desired_size
-
-    ami_id                     = data.aws_ami.eks_default.image_id
-    enable_bootstrap_user_data = true
-
-    pre_bootstrap_user_data = <<-EOT
-        export FOO=bar
-      EOT
-
-    post_bootstrap_user_data = <<-EOT
-        echo "you are free little kubelet!"
-      EOT
-
-    capacity_type        = "SPOT"
-    force_update_version = true
-    instance_types       = ["m6i.large", "m5.large", "m5n.large", "m5zn.large"]
-    labels = {
-      GithubRepo = "terraform-aws-eks"
-      GithubOrg  = "terraform-aws-modules"
-    }
-
-    taints = [
-      {
-        key    = "dedicated"
-        value  = "gpuGroup"
-        effect = "NO_SCHEDULE"
-      }
-    ]
-
-    update_config = {
-      max_unavailable_percentage = 33 # or set `max_unavailable`
-    }
-
-    description = "EKS managed node group example launch template"
-
-    ebs_optimized           = true
-    disable_api_termination = false
-    enable_monitoring       = true
-
-    block_device_mappings = {
-      xvda = {
-        device_name = "/dev/xvda"
-        ebs = {
-          volume_size           = 75
-          volume_type           = "gp3"
-          iops                  = 3000
-          throughput            = 150
-          encrypted             = true
-          kms_key_id            = module.ebs_kms_key.key_arn
-          delete_on_termination = true
-        }
-      }
-    }
-
-    metadata_options = {
-      http_endpoint               = "enabled"
-      http_tokens                 = "required"
-      http_put_response_hop_limit = 2
-      instance_metadata_tags      = "disabled"
-    }
-
-    create_iam_role          = true
-    iam_role_name            = "eks-managed-node-group-complete-example"
-    iam_role_use_name_prefix = false
-    iam_role_description     = "EKS managed node group complete example role"
-    iam_role_tags = {
-      Purpose = "Protector of the kubelet"
-    }
-    iam_role_additional_policies = {
-      AmazonEC2ContainerRegistryReadOnly = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
-      additional                         = aws_iam_policy.node_additional.arn
-    }
-
-    schedules = {
-      scale-up = {
-        min_size     = 2
-        max_size     = "-1" # Retains current max size
-        desired_size = 2
-        start_time   = "2023-03-05T00:00:00Z"
-        end_time     = "2024-03-05T00:00:00Z"
-        timezone     = "Etc/GMT+0"
-        recurrence   = "0 0 * * *"
-      },
-      scale-down = {
-        min_size     = 0
-        max_size     = "-1" # Retains current max size
-        desired_size = 0
-        start_time   = "2023-03-05T12:00:00Z"
-        end_time     = "2024-03-05T12:00:00Z"
-        timezone     = "Etc/GMT+0"
-        recurrence   = "0 12 * * *"
-      }
-    }
-
-    tags = {
-      ExtraTag = "EKS managed node group complete example"
-    }
-  }
-
-
-  tags = local.tags
 }
-
-
 
 resource "aws_iam_role_policy_attachment" "ng_worker" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
