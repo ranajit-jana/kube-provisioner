@@ -189,7 +189,7 @@ module "eks_managed_node_group" {
         }
       }
     }
-
+  }
 
 
   depends_on = [
