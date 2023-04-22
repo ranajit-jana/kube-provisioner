@@ -174,33 +174,21 @@ module "eks_managed_node_group" {
   desired_size = var.node_group_desired_size
 
 
+  al2 = {
+    instance_types = ["m6i.large", "m5.large", "m5n.large", "m5zn.large"]
+    capacity_type  = "SPOT"
 
-  instance_types = ["t3.large"]
-  capacity_type  = "SPOT"
-
-
-  subnet_ids                        = var.subnet_ids
-  cluster_primary_security_group_id = module.eks.cluster_primary_security_group_id
-  vpc_security_group_ids = [
-    module.eks.cluster_security_group_id,
-  ]
-
-  ami_type = "BOTTLEROCKET_x86_64"
-  platform = "bottlerocket"
-
-  # this will get added to what AWS provides
-  bootstrap_extra_args = <<-EOT
-    # extra args added
-    [settings.kernel]
-    lockdown = "integrity"
-    [settings.kubernetes.node-labels]
-    "label1" = "race"
-    "label2" = "capstone"
-  EOT
-
-  tags = merge(local.tags, { Separate = "eks-managed-node-group" })
-
-
+    block_device_mappings = {
+      xvda = {
+        device_name = "/dev/xvda"
+        ebs = {
+          volume_size = 75
+          volume_type = "gp3"
+          iops        = 3000
+          throughput  = 150
+        }
+      }
+    }
 
 
 
