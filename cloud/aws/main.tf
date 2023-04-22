@@ -19,33 +19,16 @@ module "eks" {
   vpc_id     = var.vpc_id
   subnet_ids = var.subnet_ids
 
-  cluster_endpoint_public_access  = true
-  cluster_endpoint_private_access = true
+  cluster_endpoint_public_access       = var.cluster_endpoint_public_access
+  cluster_endpoint_private_access      = var.cluster_endpoint_private_access
+  cluster_endpoint_public_access_cidrs = var.cluster_endpoint_public_access_cidrs
+  create_kms_key                       = var.create_kms_key
+  kms_key_enable_default_policy        = var.kms_key_enable_default_policy
 
 
-  cluster_addons = {
-    coredns = {
-      most_recent       = true
-      resolve_conflicts = "OVERWRITE"
-    }
-    kube-proxy = {
-      most_recent       = true
-      resolve_conflicts = "OVERWRITE"
-    }
-    vpc-cni = {
-      most_recent       = true
-      resolve_conflicts = "OVERWRITE"
-    }
-  }
+  kms_key_administratorys = var.access_role
 
-  eks_managed_node_groups = {
-    eks_node = {
-      instance_types = var.node_group_instance_types
-      min_size       = var.node_group_min_size
-      max_size       = var.node_group_max_size
-      desired_size   = var.node_group_desired_size
-    }
-  }
+  create_cni_ipv6_iam_policy = false
 
   # Extend cluster security group rules
   cluster_security_group_additional_rules = {
@@ -123,7 +106,7 @@ resource "kubernetes_config_map" "aws_auth" {
         ]
       },
       {
-        rolearn  = "arn:aws:iam::890504605381:user/terraformrunner"
+        rolearn  = "arn:aws:iam::890504605381:role/terraformuser"
         username = "terraformrunner"
         groups   = ["system:masters"]
       }
@@ -143,12 +126,29 @@ resource "kubernetes_config_map" "aws_auth" {
   ]
 }
 
+resource "aws_eks_addon" "coredns" {
+  addon_name        = "coredns"
+  cluster_name      = var.cluster_name
+  resolve_conflicts = "OVERWRITE"
+  depends_on = [
+    module.eks_managed_node_group
+  ]
+}
 
+resource "aws_eks_addon" "kubeproxy" {
+  addon_name        = "kube-proxy"
+  cluster_name      = var.cluster_name
+  resolve_conflicts = "OVERWRITE"
+  depends_on = [
+    module.eks_managed_node_group
+  ]
+
+}
 
 module "eks_managed_node_group" {
   source = "terraform-aws-modules/eks/aws//modules/eks-managed-node-group"
 
-  name            = "separate-eks-mng"
+  name            = each.key
   cluster_name    = module.eks.cluster_name
   cluster_version = module.eks.cluster_version
 
@@ -205,5 +205,25 @@ resource "aws_iam_role_policy_attachment" "ng_ecr" {
 resource "aws_iam_role_policy_attachment" "ng_cni" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
   role       = module.eks_managed_node_group.iam_role_arn
+}
+
+resource "aws_iam_role" "ng_role" {
+  name               = "kube-${var.cluster_name}-NodeGroupRole"
+  assume_role_policy = <<POLICY
+  {
+    "Version": "2012-10-17"
+    "Statement": [
+      {
+       "Effect": "Allow"
+       "Principal": {
+        "Service":[
+          "ec2.amazonaws.com
+        ]
+       },
+       "Action": "sts:AssumeRole"
+      }
+    ]
+  }
+  POLICY
 }
 
