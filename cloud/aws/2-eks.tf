@@ -1,9 +1,9 @@
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "~> 19.0"
+  version = "18.29.0"
 
   cluster_name    = "my-eks"
-  cluster_version = "1.25"
+  cluster_version = "1.23"
 
   cluster_endpoint_private_access = true
   cluster_endpoint_public_access  = true
@@ -68,11 +68,11 @@ module "eks" {
 
 # https://github.com/terraform-aws-modules/terraform-aws-eks/issues/2009
 data "aws_eks_cluster" "default" {
-  name = "my-eks"
+  name = module.eks.cluster_id
 }
 
 data "aws_eks_cluster_auth" "default" {
-  name = "my-eks"
+  name = module.eks.cluster_id
 }
 
 provider "kubernetes" {
