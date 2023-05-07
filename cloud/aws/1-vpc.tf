@@ -5,7 +5,7 @@ locals {
     GithubRepo = "kube-provisioner"
     GithubOrg  = "ranajit-jana"
   }
-  
+
   s3_bucket_name = "vpc-flow-logs-to-s3-${random_pet.this.id}"
 }
 
@@ -15,7 +15,7 @@ resource "random_pet" "this" {
 
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "3.14.3"
+  version = "4.0.1"
 
   name = "main"
   cidr = "10.0.0.0/16"
@@ -50,7 +50,7 @@ module "vpc" {
 # S3 Bucket
 module "s3_bucket" {
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "~> 3.0"
+  version = "= 3.10.1"
 
   bucket        = local.s3_bucket_name
   policy        = data.aws_iam_policy_document.flow_log_s3.json

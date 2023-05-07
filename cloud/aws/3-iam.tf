@@ -1,6 +1,6 @@
 module "allow_eks_access_iam_policy" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.3.1"
+  version = "5.18.1"
 
   name          = "allow-eks-access"
   create_policy = true
@@ -22,7 +22,7 @@ module "allow_eks_access_iam_policy" {
 
 module "eks_admins_iam_role" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
-  version = "5.3.1"
+  version = "5.18.0"
 
   role_name         = "eks-admin"
   create_role       = true
@@ -38,7 +38,7 @@ module "eks_admins_iam_role" {
 
 module "allow_assume_eks_admins_iam_policy" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.3.1"
+  version = "5.18.0"
 
   name          = "allow-assume-eks-admin-iam-role"
   create_policy = true
@@ -66,7 +66,7 @@ data "aws_iam_user" "kubeuser" {
 
 module "eks_admins_iam_group" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-group-with-policies"
-  version = "5.3.1"
+  version = "5.18.0"
 
   name                              = "eks-admin"
   attach_iam_self_management_policy = false
