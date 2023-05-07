@@ -1,3 +1,13 @@
+
+locals {
+
+  s3_bucket_name = "vpc-flow-logs-to-s3-${random_pet.this.id}"
+}
+
+resource "random_pet" "this" {
+  length = 2
+}
+
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "3.14.3"
