@@ -26,7 +26,7 @@ module "vpc" {
   private_subnet_tags = {
     "kubernetes.io/role/internal-elb" = "1"
   }
-
+  flow_log_file_format = "parquet"
   enable_flow_log           = true
   flow_log_destination_type = "s3"
   flow_log_destination_arn  = module.s3_bucket.s3_bucket_arn
@@ -42,4 +42,33 @@ module "s3_bucket" {
   force_destroy = true
 
   tags = local.tags
+}
+
+
+data "aws_iam_policy_document" "flow_log_s3" {
+  statement {
+    sid = "AWSLogDeliveryWrite"
+
+    principals {
+      type        = "Service"
+      identifiers = ["delivery.logs.amazonaws.com"]
+    }
+
+    actions = ["s3:PutObject"]
+
+    resources = ["arn:aws:s3:::${local.s3_bucket_name}/AWSLogs/*"]
+  }
+
+  statement {
+    sid = "AWSLogDeliveryAclCheck"
+
+    principals {
+      type        = "Service"
+      identifiers = ["delivery.logs.amazonaws.com"]
+    }
+
+    actions = ["s3:GetBucketAcl"]
+
+    resources = ["arn:aws:s3:::${local.s3_bucket_name}"]
+  }
 }
