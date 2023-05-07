@@ -30,8 +30,7 @@ module "eks_admins_iam_role" {
   custom_role_policy_arns = [module.allow_eks_access_iam_policy.arn]
 
   trusted_role_arns = [
-    "arn:aws:iam::${module.vpc.vpc_owner_id}:root",
-    data.aws_iam_role.deploy.arn
+    "arn:aws:iam::${module.vpc.vpc_owner_id}:root"
   ]
 }
 
@@ -74,5 +73,5 @@ module "eks_admins_iam_group" {
   attach_iam_self_management_policy = false
   create_group                      = true
   group_users                       = [data.aws_iam_user.kubeuser.user_name]
-  custom_group_policy_arns          = [data.aws_iam_role.deploy.arn, module.allow_assume_eks_admins_iam_policy.arn]
+  custom_group_policy_arns          = [module.allow_assume_eks_admins_iam_policy.arn]
 }
