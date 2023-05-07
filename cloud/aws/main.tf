@@ -1,6 +1,6 @@
 
 locals {
-  region = "ap-south-1"
+  region = "us-east-1"
 
   tags = {
     GithubRepo = "kube-provisioner"
@@ -144,90 +144,94 @@ resource "kubernetes_config_map" "aws_auth" {
 }
 
 
-module "eks_managed_node_group" {
-  source = "terraform-aws-modules/eks/aws//modules/eks-managed-node-group"
+module "eks" {
+  source  = "terraform-aws-modules/eks/aws"
+  version = "18.29.0"
 
-  name            = "separate-eks-mng"
-  cluster_name    = var.cluster_name
-  cluster_version = var.cluster_version
+  cluster_name    = "my-eks"
+  cluster_version = "1.23"
 
-  subnet_ids = var.subnet_ids
+  cluster_endpoint_private_access = true
+  cluster_endpoint_public_access  = true
 
-  // The following variables are necessary if you decide to use the module outside of the parent EKS module context.
-  // Without it, the security groups of the nodes are empty and thus won't join the cluster.
-  cluster_primary_security_group_id = module.eks.cluster_primary_security_group_id
-  vpc_security_group_ids            = [module.eks.node_security_group_id]
+  vpc_id     = module.vpc.vpc_id
+  subnet_ids = module.vpc.private_subnets
 
-  // Note: `disk_size`, and `remote_access` can only be set when using the EKS managed node group default launch template
-  // This module defaults to providing a custom launch template to allow for custom security groups, tag propagation, etc.
-  // use_custom_launch_template = false
-  // disk_size = 50
-  //
-  //  # Remote access cannot be specified with a launch template
-  //  remote_access = {
-  //    ec2_ssh_key               = module.key_pair.key_pair_name
-  //    source_security_group_ids = [aws_security_group.remote_access.id]
-  //  }
+  enable_irsa = true
 
-  min_size     = 1
-  max_size     = 10
-  desired_size = 1
-
-  instance_types = ["t3.large"]
-  capacity_type  = "SPOT"
-
-  labels = {
-    Environment = "test"
-    GithubRepo  = "terraform-aws-eks"
-    GithubOrg   = "terraform-aws-modules"
+  eks_managed_node_group_defaults = {
+    disk_size = 50
   }
 
-  taints = {
-    dedicated = {
-      key    = "dedicated"
-      value  = "gpuGroup"
-      effect = "NO_SCHEDULE"
+  eks_managed_node_groups = {
+    general = {
+      desired_size = 1
+      min_size     = 1
+      max_size     = 10
+
+      labels = {
+        role = "general"
+      }
+
+      instance_types = ["t3.small"]
+      capacity_type  = "ON_DEMAND"
+    }
+
+    spot = {
+      desired_size = 1
+      min_size     = 1
+      max_size     = 10
+
+      labels = {
+        role = "spot"
+      }
+
+      taints = [{
+        key    = "market"
+        value  = "spot"
+        effect = "NO_SCHEDULE"
+      }]
+
+      instance_types = ["t3.micro"]
+      capacity_type  = "SPOT"
     }
   }
 
+
+  kms_key_deletion_window_in_days = 7
+
+  node_security_group_additional_rules = {
+    ingress_allow_access_from_control_plane = {
+      type                          = "ingress"
+      protocol                      = "tcp"
+      from_port                     = 9443
+      to_port                       = 9443
+      source_cluster_security_group = true
+      description                   = "Allow access from control plane to webhook port of AWS load balancer controller"
+    }
+  }
+
+
+
+  manage_aws_auth_configmap = true
+  aws_auth_roles = [
+    {
+      rolearn  = module.eks_admins_iam_role.iam_role_arn
+      username = module.eks_admins_iam_role.iam_role_name
+      groups   = ["system:masters"]
+    },
+  ]
+
   tags = {
-    Environment = "dev"
-    Terraform   = "true"
+    Environment = "staging"
   }
 }
-
-resource "aws_iam_role_policy_attachment" "ng_worker" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
-  role       = module.eks_managed_node_group.iam_role_arn
+# https://github.com/terraform-aws-modules/terraform-aws-eks/issues/2009
+data "aws_eks_cluster" "default" {
+  name = module.eks.cluster_id
 }
 
-
-resource "aws_iam_role_policy_attachment" "ng_ecr" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
-  role       = module.eks_managed_node_group.iam_role_arn
-}
-
-
-resource "aws_iam_role_policy_attachment" "ng_cni" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
-  role       = module.eks_managed_node_group.iam_role_arn
-}
-
-resource "aws_iam_role" "ng_role" {
-  name               = "kube-${var.cluster_name}-NodeGroupRole"
-  assume_role_policy = <<POLICY
-  {
-  	"Version": "2012-10-17",
-  	"Statement": [{
-  		"Effect": "Allow",
-  		"Principal": {
-  			"Service": [
-  				"ec2.amazonaws.com"
-  			]
-  		},
-  		"Action": "sts:AssumeRole"
-  	}]
-  }
-  POLICY
+data "aws_eks_cluster_auth" "default" {
+  name = module.eks.cluster_id
 }
 
