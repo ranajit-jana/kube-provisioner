@@ -27,4 +27,19 @@ module "vpc" {
     "kubernetes.io/role/internal-elb" = "1"
   }
 
+  enable_flow_log           = true
+  flow_log_destination_type = "s3"
+  flow_log_destination_arn  = module.s3_bucket.s3_bucket_arn
+}
+
+# S3 Bucket
+module "s3_bucket" {
+  source  = "terraform-aws-modules/s3-bucket/aws"
+  version = "~> 3.0"
+
+  bucket        = local.s3_bucket_name
+  policy        = data.aws_iam_policy_document.flow_log_s3.json
+  force_destroy = true
+
+  tags = local.tags
 }
