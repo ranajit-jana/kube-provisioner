@@ -22,3 +22,19 @@ terraform {
 
   required_version = "~> 1.0"
 }
+
+
+
+locals {
+
+  tags = {
+    GithubRepo = "kube-provisioner"
+    GithubOrg  = "ranajit-jana"
+  }
+  oidc_provider  = replace(module.eks.cluster_oidc_issuer_url, "https://", "")
+  s3_bucket_name = "vpc-flow-logs-to-s3-${random_pet.this.id}"
+}
+
+resource "random_pet" "this" {
+  length = 2
+}
