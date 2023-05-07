@@ -1,6 +1,11 @@
 
 locals {
 
+  tags = {
+    GithubRepo = "kube-provisioner"
+    GithubOrg  = "ranajit-jana"
+  }
+  
   s3_bucket_name = "vpc-flow-logs-to-s3-${random_pet.this.id}"
 }
 
