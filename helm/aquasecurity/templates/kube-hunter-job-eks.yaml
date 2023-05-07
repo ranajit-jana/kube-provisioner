@@ -1,6 +1,7 @@
 apiVersion: batch/v1
 kind: Job
-name: kube-hunter-{{ include "aquasecurity.fullname" . }}
+metadata:
+  name: kube-hunter-{{ include "aquasecurity.fullname" . }}
 spec:
   template:
     metadata:
