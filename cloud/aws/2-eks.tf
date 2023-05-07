@@ -49,9 +49,6 @@ module "eks" {
       instance_types = ["t3.micro"]
       capacity_type  = "SPOT"
     }
-    vpc_security_group_ids = [
-      aws_security_group.node_group_one.id
-    ]
   }
 
   tags = {
