@@ -19,6 +19,7 @@ module "allow_eks_access_iam_policy" {
   })
 }
 
+
 module "eks_admins_iam_role" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
   version = "5.3.1"
@@ -33,6 +34,7 @@ module "eks_admins_iam_role" {
     "arn:aws:iam::${module.vpc.vpc_owner_id}:root"
   ]
 }
+
 
 module "allow_assume_eks_admins_iam_policy" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
@@ -55,15 +57,12 @@ module "allow_assume_eks_admins_iam_policy" {
   })
 }
 
+
 # test this - the user taken out 
 data "aws_iam_user" "kubeuser" {
   user_name = "kubeuser"
 }
 
-
-data "aws_iam_role" "deploy" {
-  name = "Deploy-with-OIDC"
-}
 
 module "eks_admins_iam_group" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-group-with-policies"
@@ -75,3 +74,4 @@ module "eks_admins_iam_group" {
   group_users                       = [data.aws_iam_user.kubeuser.user_name]
   custom_group_policy_arns          = [module.allow_assume_eks_admins_iam_policy.arn]
 }
+
