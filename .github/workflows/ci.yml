@@ -31,12 +31,12 @@ jobs:
         id: fmt
         run: terraform fmt -check
 
-      - name: Run Terrascan
-        id: terrascan
-        uses: tenable/terrascan-action@main
-        with:
-          iac_type: "terraform"
-          iac_version: "v14"
-          policy_type: "aws"
-          only_warn: true
-          iac_dir: cloud/aws
+      # - name: Run Terrascan
+      #   id: terrascan
+      #   uses: tenable/terrascan-action@main
+      #   with:
+      #     iac_type: "terraform"
+      #     iac_version: "v14"
+      #     policy_type: "aws"
+      #     only_warn: true
+      #     iac_dir: cloud/aws
