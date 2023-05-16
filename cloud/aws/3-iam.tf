@@ -53,6 +53,13 @@ module "allow_assume_eks_admins_iam_policy" {
         Effect   = "Allow"
         Resource = module.eks_admins_iam_role.iam_role_arn
       },
+      {
+        Action = [
+          "sts:AssumeRole",
+        ]
+        Effect   = "Allow"
+        Resource = data.aws_iam_user.kubeuser.arn
+      },
     ]
   })
 }
