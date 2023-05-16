@@ -31,8 +31,16 @@ module "eks_admins_iam_role" {
   custom_role_policy_arns = [module.allow_eks_access_iam_policy.arn]
 
   trusted_role_arns = [
-    "arn:aws:iam::${module.vpc.vpc_owner_id}:root"
+    "arn:aws:iam::${module.vpc.vpc_owner_id}:root",
+    "arn:aws:iam::890504605381:user/kubeuser"
   ]
+
+  lifecycle {
+    ignore_changes = [
+      tags,
+      role_last_used,
+    ]
+  }
 }
 
 
