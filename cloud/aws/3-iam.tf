@@ -31,8 +31,7 @@ module "eks_admins_iam_role" {
   custom_role_policy_arns = [module.allow_eks_access_iam_policy.arn]
 
   trusted_role_arns = [
-    "arn:aws:iam::${module.vpc.vpc_owner_id}:root",
-    module.eks_admins_iam_role.iam_role_arn
+    "arn:aws:iam::${module.vpc.vpc_owner_id}:root"
   ]
 }
 
