@@ -3,7 +3,7 @@ module "eks" {
   version = "~> 19.0"
 
   cluster_name    = "my-eks"
-  cluster_version = "1.25"
+  cluster_version = "1.26"
 
   cluster_endpoint_private_access = true
   cluster_endpoint_public_access  = true
@@ -55,6 +55,7 @@ module "eks" {
     Environment = "staging"
   }
 
+  kms_key_deletion_window_in_days =7
   manage_aws_auth_configmap = true
   aws_auth_roles = [
     {
