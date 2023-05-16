@@ -58,10 +58,6 @@ jobs:
       - name: Setup helmfile
         uses: mamezou-tech/setup-helmfile@v1.2.0
 
-      - name: list all the pods
-        run: |
-          kubectl get pods
-
       - name: Helm sync
         working-directory: helm
         run: |
