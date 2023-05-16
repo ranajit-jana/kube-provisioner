@@ -1,0 +1,19 @@
+aws eks register-cluster \
+     --name my-eks \
+      --region us-east-1 \
+     --connector-config roleArn=arn:aws:iam::890504605381:role/eks-admin,provider="OTHER" 
+
+
+
+aws --version
+
+aws sts get-caller-identity
+
+aws eks --region us-east-1 update-kubeconfig --name my-eks
+
+kubectl get pods --kubeconfig ./.kube/config
+
+
+aws eks update-kubeconfig --name my-eks —region us-east-1 —profile MY-PROFILE
+
+kubectl config view --minify
