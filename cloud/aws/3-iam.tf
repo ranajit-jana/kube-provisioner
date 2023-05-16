@@ -35,12 +35,6 @@ module "eks_admins_iam_role" {
     "arn:aws:iam::890504605381:user/kubeuser"
   ]
 
-  lifecycle {
-    ignore_changes = [
-      tags,
-      role_last_used,
-    ]
-  }
 }
 
 
