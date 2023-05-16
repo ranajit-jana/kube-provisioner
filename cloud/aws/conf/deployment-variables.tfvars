@@ -1,22 +1,38 @@
-node_group_max_size       = 4
-node_group_min_size       = 1
-node_group_desired_size   = 2
-node_group_instance_types = ["t3a.medium"]
+/*
+Copyright 2023 The Kubernetes Authors.
 
-account_number = 890504605381
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
-vpc_id     = "vpc-0aa863f04f42d7a17"
-subnet_ids = ["subnet-06d71bcd8eab5d7cc", "subnet-0016baaa1ad983d1d", "subnet-07c713ac6f9a1f780"]
+    http://www.apache.org/licenses/LICENSE-2.0
 
-cluster_name                         = "race-capstone"
-cluster_version                      = "1.25"
-cluster_endpoint_public_access       = true
-cluster_endpoint_private_access      = true
-cluster_endpoint_public_access_cidrs = ["0.0.0.0/0"]
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 
-create_kms_key                = true
-kms_key_enable_default_policy = true
-legacy_nodegroup              = false
+cluster_name    = "my-eks"
+cluster_region  = "us-east-1"
+cluster_version = "1.25"
 
-access_role = "arn:aws:iam::890504605381:role/terraformuser"
+vpc_cidr                  = "10.0.0.0/16"
+vpc_secondary_cidr_blocks = ["10.1.0.0/16", "10.2.0.0/16"]
+vpc_public_subnet         = ["10.0.0.0/18", "10.0.64.0/18", "10.0.128.0/18"]
+vpc_private_subnet        = ["10.1.0.0/18", "10.1.64.0/18", "10.1.128.0/18"]
+vpc_intra_subnet          = ["10.2.0.0/18", "10.2.64.0/18", "10.2.128.0/18"]
 
+# Ubuntu EKS optimized AMI: https://cloud-images.ubuntu.com/aws-eks/
+node_ami            = "ami-03de35fda144b3672"
+node_instance_types = ["r5ad.4xlarge"]
+node_volume_size    = 100
+
+# TODO(xmudrii): Increase this later.
+node_min_size                   = 2
+node_max_size                   = 2
+node_desired_size               = 2
+node_max_unavailable_percentage = 100 # To ease testing
+
+cluster_autoscaler_version = "v1.25.0"
