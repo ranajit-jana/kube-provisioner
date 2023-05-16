@@ -26,7 +26,7 @@ vpc_intra_subnet          = ["10.2.0.0/18", "10.2.64.0/18", "10.2.128.0/18"]
 
 # Ubuntu EKS optimized AMI: https://cloud-images.ubuntu.com/aws-eks/
 node_ami            = "ami-0ca4a88bd4c573f41"
-node_instance_types = ["t2.medium"]
+node_instance_types = ["t3.medium"]
 node_volume_size    = 30
 
 # TODO(xmudrii): Increase this later.
