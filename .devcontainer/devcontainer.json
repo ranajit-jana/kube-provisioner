@@ -1,20 +1,23 @@
 {
-  "name": "AWS Terraform",
-  "build": {
-    "dockerfile": "Dockerfile",
-    "args": {
-      "VARIANT": "ubuntu-22.04",
-      "TERRAFORM_DOCS_VERSION": "0.16.0",
-      "TFSEC_VERSION": "1.28.0",
-      "TERRASCAN_VERSION": "1.15.2",
-      "TFLINT_AWS_RULESET_VERSION": "0.21.1"
-    }
+  "name": "Go",
+  // Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
+  "image": "mcr.microsoft.com/devcontainers/go:0-1.19",
+  "features": {
+    "ghcr.io/devcontainers/features/kubectl-helm-minikube:1": {},
+    "ghcr.io/devcontainers-contrib/features/kubectx-kubens": {},
+    "ghcr.io/mpriscella/features/kind": {},
+    "ghcr.io/devcontainers/features/terraform:1": {},
+    "ghcr.io/devcontainers-contrib/features/terrascan:1": {},
+    "ghcr.io/devcontainers-contrib/features/tfsec:1": {},
+    "ghcr.io/natescherer/devcontainers-custom-features/k9s:1": {},
+    "ghcr.io/devcontainers/features/aws-cli:1": {}
   },
-  "postStartCommand": "post-start",
-  "settings": {},
-  "extensions": [
-	"hashicorp.terraform",
-	"extactcom.gfe---good-for-eyes"
-],
-  "remoteUser": "vscode"
+  "customizations": {
+    "codespaces": {
+      "openFiles": ["README.md"]
+    },
+    "vscode": {
+      "extensions": ["hashicorp.terraform", "extactcom.gfe---good-for-eyes"]
+    }
+  }
 }
