@@ -60,11 +60,17 @@ module "eks" {
   aws_auth_roles = [
     {
       rolearn  = module.eks_admins_iam_role.iam_role_arn
+      username = module.eks_admins_iam_role.iam_role_name
+      groups   = ["system:masters"]
+    },
+  ]
+  aws_auth_users = [
+    {
+      rolearn  = data.aws_iam_user.kubeuser.arn
       username = data.aws_iam_user.kubeuser.user_name
       groups   = ["system:masters"]
     },
   ]
-
 }
 
 # https://github.com/terraform-aws-modules/terraform-aws-eks/issues/2009
