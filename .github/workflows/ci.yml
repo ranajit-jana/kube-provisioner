@@ -41,8 +41,3 @@ jobs:
           only_warn: true
           iac_dir: cloud/aws
           sarif_upload: true
-
-      - name: Upload SARIF file
-        uses: github/codeql-action/upload-sarif@v2
-        with:
-          sarif_file: terrascan.sarif  
