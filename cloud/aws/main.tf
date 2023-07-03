@@ -139,13 +139,21 @@ resource "kubernetes_config_map" "aws_auth" {
       },
       {
         rolearn  = "arn:aws:iam::890504605381:role/terraformuser"
-        username = "	terraformuser"
+        username = "terraformuser"
         groups = [
           "system:masters"
         ]
       },
     ])
-    "mapUsers" = yamlencode([])
+    "mapUsers" = yamlencode([
+      {
+        userarn  = "arn:aws:iam::890504605381:user/kubeuser"
+        username = "kubeuser"
+        groups = [
+          "system:masters"
+        ]
+      },
+    ])
   }
   lifecycle {
     ignore_changes = [
