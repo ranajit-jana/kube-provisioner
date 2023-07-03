@@ -1,74 +1,257 @@
-/*
-Copyright 2023 The Kubernetes Authors.
+locals {
+  root_account_arn = "arn:aws:iam::890504605381:root"
+  tags             = { "name" : "project" }
+}
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
-
-###############################################
-# INITIALIZATION
-###############################################
 
 provider "aws" {
   region = var.cluster_region
-
-  # We have a chicken-egg problem here. This role is not going to exist
-  # when creating the cluster for the first time. In that case, this must
-  # be commented, than uncommented afterwards.
-  # assume_role {
-  #   role_arn     = "arn:aws:iam::468814281478:role/Cluster-Admin"
-  #   session_name = "build-cluster-terraform"
-  # }
 }
 
-provider "kubernetes" {
-  host                   = module.eks.cluster_endpoint
-  cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
+module "eks" {
+  source  = "terraform-aws-modules/eks/aws"
+  version = "19.10.0"
 
-  # This requires the awscli to be installed locally where Terraform is executed.
-  exec {
-    api_version = "client.authentication.k8s.io/v1beta1"
-    command     = "aws"
-    args        = ["eks", "get-token", "--cluster-name", module.eks.cluster_name, "--role-arn", aws_iam_role.iam_cluster_admin.arn]
-  }
-}
+  # General cluster properties.
+  cluster_name                    = var.cluster_name
+  cluster_version                 = var.cluster_version
+  cluster_endpoint_public_access  = true
+  cluster_endpoint_private_access = true
 
-provider "helm" {
-  kubernetes {
-    host                   = module.eks.cluster_endpoint
-    cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
+  # Manage aws-auth ConfigMap.
+  manage_aws_auth_configmap = false
 
-    # This requires the awscli to be installed locally where Terraform is executed.
-    exec {
-      api_version = "client.authentication.k8s.io/v1beta1"
-      command     = "aws"
-      args        = ["eks", "get-token", "--cluster-name", module.eks.cluster_name, "--role-arn", aws_iam_role.iam_cluster_admin.arn]
+  create_kms_key = true
+  # Allow access to the KMS key used for secrets encryption to the root account.
+  kms_key_administrators = [
+    local.root_account_arn
+  ]
+
+
+  cluster_security_group_additional_rules = {
+    egress_nodes_ephemeral_ports_tcp = {
+      description                = " 1025 to 65535"
+      protocol                   = "tcp"
+      from_port                  = 1025
+      to_port                    = 65535
+      type                       = "egress"
+      source_node_security_group = true
     }
   }
+  node_security_group_additional_rules = {
+    ingress_self_all = {
+      description = " open all"
+      protocol    = "-1"
+      from_port   = 0
+      to_port     = 0
+      type        = "ingress"
+      self        = true
+    }
+    egress_all = {
+      description = " open all egress"
+      protocol    = "-1"
+      from_port   = 0
+      to_port     = 0
+      type        = "egress"
+      cidr_blocks = ["0.0.0.0/0"]
+    }
+    ipvs = {
+      description = " open all IPVS port"
+      protocol    = "TCP"
+      from_port   = 32000
+      to_port     = 34000
+      type        = "ingress"
+      cidr_blocks = ["0.0.0.0/0"]
+    }
+    ingress_cluster_all = {
+      description                = " open all control plane port"
+      protocol                   = "-1"
+      from_port                  = 0
+      to_port                    = 0
+      type                       = "ingress"
+      source_node_security_group = true
+    }
+
+  }
+
+  # We use IPv4 for the best compatibility with the existing setup.
+  # Additionally, Ubuntu EKS optimized AMI doesn't support IPv6 well.
+  cluster_ip_family = "ipv4"
+
+  vpc_id                   = module.vpc.vpc_id
+  subnet_ids               = module.vpc.private_subnets
+  control_plane_subnet_ids = module.vpc.intra_subnets
+
+  eks_managed_node_group_defaults = {
+    ami_type       = "AL2_x86_64"
+    instance_types = ["m6i.large", "m5.large"]
+
+    # We are using the IRSA created below for permissions
+    # However, we have to deploy with the policy attached FIRST (when creating a fresh cluster)
+    # and then turn this off after the cluster/node group is created. Without this initial policy,
+    # the VPC CNI fails to assign IPs and nodes cannot join the cluster
+    # See https://github.com/aws/containers-roadmap/issues/1666 for more context
+    iam_role_attach_cni_policy = true
+    create_launch_template     = true
+    launch_template_name       = ""
+    create_security_group      = false
+  }
+
+  kms_key_deletion_window_in_days = 7
 }
 
-data "aws_caller_identity" "current" {}
-data "aws_availability_zones" "available" {}
+resource "aws_eks_addon" "coredns" {
+  addon_name        = "coredns"
+  cluster_name      = var.cluster_name
+  resolve_conflicts = "OVERWRITE"
+  depends_on        = [module.eks_managed_node_group]
+}
 
-locals {
-  root_account_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+resource "aws_eks_addon" "vpc-cni" {
+  addon_name        = "vpc-cni"
+  cluster_name      = var.cluster_name
+  resolve_conflicts = "OVERWRITE"
+  depends_on        = [module.eks_managed_node_group]
+}
 
-  tags = {
-    Cluster = var.cluster_name
+resource "aws_eks_addon" "kubeproxy" {
+  addon_name        = "kube-proxy"
+  cluster_name      = var.cluster_name
+  resolve_conflicts = "OVERWRITE"
+  depends_on        = [module.eks_managed_node_group]
+}
+
+resource "kubernetes_config_map" "aws_auth" {
+  metadata {
+    name      = "aws-auth"
+    namespace = "kube-system"
   }
-  auto_scaling_tags = {
-    "k8s.io/cluster-autoscaler/${var.cluster_name}" = "owned"
-    "k8s.io/cluster-autoscaler/enabled"             = true
+  data = {
+    "mapAccounts" = yamlencode([])
+    "mapRoles" = yamlencode([
+      {
+        rolearn  = aws_iam_role.nodegroup_role.arn
+        username = "system:node:{{EC2PrivateDNSName}}"
+        groups = [
+          "system:bootstrappers",
+          "system:nodes",
+        ]
+      },
+      {
+        rolearn  = "arn:aws:iam::890504605381:role/terraformuser"
+        username = "	kubeuser"
+        groups = [
+          "system:masters"
+        ]
+      },
+    ])
+    "mapUsers" = yamlencode([])
   }
-  node_group_tags = merge(local.tags, local.auto_scaling_tags)
-  azs             = slice(data.aws_availability_zones.available.names, 0, 3)
+  lifecycle {
+    ignore_changes = [
+      data,
+      metadata
+    ]
+  }
+  depends_on = [module.eks]
+}
+
+resource "aws_iam_role" "nodegroup_role" {
+  name               = "eks-nodegroup-nodegrouprole"
+  assume_role_policy = <<POLICY
+  {
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Effect": "Allow",
+        "Principal": {
+          "Service":[
+          "ec2.amazonaws.com"
+          ]
+        },
+        "Action": "sts:AssumeRole"
+      }
+    ]
+  }
+  POLICY
+}
+
+# resource "aws_iam_role_policy_attachment" "ng_workers" {
+#   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
+#   role       = aws_iam_role.nodegroup_role.name
+# }
+
+# resource "aws_iam_role_policy_attachment" "ng_ecr" {
+#   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+#   role       = aws_iam_role.nodegroup_role.name
+# }
+
+# resource "aws_iam_role_policy_attachment" "ng_cni" {
+#   policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
+#   role       = aws_iam_role.nodegroup_role.name
+# }
+
+
+
+resource "aws_iam_role_policy_attachment" "this" {
+  for_each = { for k, v in toset([
+    "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy",
+    "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly",
+    "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
+  ]) : k => v }
+
+  policy_arn = each.value
+  role       = aws_iam_role.nodegroup_role.name
+}
+
+
+# module "eks_managed_node_group" {
+#   source  = "terraform-aws-modules/eks/aws//modules/eks-managed-node-group"
+#   version = "19.5.1"
+#   create  = true
+
+#   name            = "separate-eks-mng"
+#   cluster_name    = var.cluster_name
+#   cluster_version = var.cluster_version
+#   subnet_ids      = module.vpc.private_subnets
+
+#   // The following variables are necessary if you decide to use the module outside of the parent EKS module context.
+#   // Without it, the security groups of the nodes are empty and thus won't join the cluster.
+#   cluster_primary_security_group_id = module.eks.cluster_primary_security_group_id
+#   vpc_security_group_ids            = [module.eks.node_security_group_id]
+
+#   ami_type                   = "AL2_x86_64"
+#   instance_types             = ["m6i.large", "m5.large"]
+#   create_iam_role            = false
+#   iam_role_arn               = aws_iam_role.nodegroup_role.arn
+#   iam_role_attach_cni_policy = false
+#   cluster_ip_family          = "ipv4"
+#   min_size                   = 1
+#   max_size                   = 2
+#   desired_size               = 1
+
+#   depends_on = [kubernetes_config_map.aws_auth]
+# }
+module "eks_managed_node_group" {
+  source  = "terraform-aws-modules/eks/aws//modules/eks-managed-node-group"
+  version = "19.5.1"
+
+  name            = "separate-eks-mng"
+  cluster_name    = module.eks.cluster_name
+  cluster_version = module.eks.cluster_version
+
+  subnet_ids = module.vpc.private_subnets
+  vpc_security_group_ids = [
+    module.eks.cluster_primary_security_group_id,
+    module.eks.cluster_security_group_id,
+  ]
+
+  create_iam_role = false
+  iam_role_arn    = aws_iam_role.nodegroup_role.arn
+
+  min_size     = 1
+  max_size     = 3
+  desired_size = 1
+
+  tags = local.tags
 }

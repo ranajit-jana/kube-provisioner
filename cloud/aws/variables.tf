@@ -93,3 +93,7 @@ variable "cluster_autoscaler_version" {
   type        = string
   description = "Cluster Autoscaler version to use (must match the EKS version)"
 }
+variable "azs" {
+  type        = list(string)
+  description = "availablity zone"
+}
