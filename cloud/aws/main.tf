@@ -139,7 +139,7 @@ resource "kubernetes_config_map" "aws_auth" {
       },
       {
         rolearn  = "arn:aws:iam::890504605381:role/terraformuser"
-        username = "	kubeuser"
+        username = "	terraformuser"
         groups = [
           "system:masters"
         ]
