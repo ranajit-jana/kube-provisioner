@@ -16,13 +16,14 @@ limitations under the License.
 
 cluster_name    = "my-eks"
 cluster_region  = "us-east-1"
-cluster_version = "1.25"
+cluster_version = "1.24"
 
 vpc_cidr                  = "10.0.0.0/16"
 vpc_secondary_cidr_blocks = ["10.1.0.0/16", "10.2.0.0/16"]
 vpc_public_subnet         = ["10.0.0.0/18", "10.0.64.0/18", "10.0.128.0/18"]
 vpc_private_subnet        = ["10.1.0.0/18", "10.1.64.0/18", "10.1.128.0/18"]
 vpc_intra_subnet          = ["10.2.0.0/18", "10.2.64.0/18", "10.2.128.0/18"]
+azs                       = ["us-east-1a", "us-east-1b", "us-east-1c"]
 
 # Ubuntu EKS optimized AMI: https://cloud-images.ubuntu.com/aws-eks/
 node_ami            = "ami-0f7888c998e2e742a"
