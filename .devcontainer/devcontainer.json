@@ -10,7 +10,8 @@
     "ghcr.io/devcontainers-contrib/features/terrascan:1": {},
     "ghcr.io/devcontainers-contrib/features/tfsec:1": {},
     "ghcr.io/natescherer/devcontainers-custom-features/k9s:1": {},
-    "ghcr.io/devcontainers/features/aws-cli:1": {}
+    "ghcr.io/devcontainers/features/aws-cli:1": {},
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
   },
   "customizations": {
     "codespaces": {
