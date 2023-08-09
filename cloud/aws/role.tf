@@ -23,7 +23,7 @@ resource "aws_iam_policy" "kube_bench_security_hub" {
       {
         "Effect" : "Allow",
         "Action" : "securityhub:BatchImportFindings",
-        "Resource" : "arn:aws:securityhub:eu-east-1::product/aqua-security/kube-bench"
+        "Resource" : "arn:aws:securityhub:us-east-1::product/aqua-security/kube-bench"
       }
     ]
   })
