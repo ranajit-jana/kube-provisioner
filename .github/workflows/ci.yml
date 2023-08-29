@@ -9,6 +9,8 @@ on:
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
+permissions: write-all
+
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -33,7 +35,7 @@ jobs:
 
       - name: Run Terrascan
         id: terrascan
-        uses: tenable/terrascan-action@main
+        uses: tenable/terrascan-action@v1.5.0
         with:
           iac_type: "terraform"
           iac_version: "v14"
@@ -41,3 +43,7 @@ jobs:
           only_warn: true
           iac_dir: cloud/aws
           sarif_upload: true
+      # - name: Upload SARIF file
+      #   uses: github/codeql-action/upload-sarif@v1
+      #   with:
+      #       sarif_file: terrascan.sarif
