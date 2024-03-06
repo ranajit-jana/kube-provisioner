@@ -38,6 +38,7 @@ jobs:
         with:
           scan-type: 'config'
           hide-progress: false
+          scan-ref: ./cloud/aws
           format: 'table'
           exit-code: '1'
           ignore-unfixed: false
@@ -48,6 +49,7 @@ jobs:
         with:
           scan-type: 'fs'
           hide-progress: false
+          scan-ref: ./cloud/aws
           format: 'table'
           exit-code: '1'
           ignore-unfixed: false
