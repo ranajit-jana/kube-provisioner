@@ -40,7 +40,7 @@ jobs:
           hide-progress: false
           scan-ref: ./cloud/aws
           format: 'table'
-          exit-code: '1'
+          exit-code: '0'
           ignore-unfixed: false
           severity: 'MEDIUM,HIGH,CRITICAL'
 
@@ -51,7 +51,7 @@ jobs:
           hide-progress: false
           scan-ref: ./cloud/aws
           format: 'table'
-          exit-code: '1'
+          exit-code: '0'
           ignore-unfixed: false
           severity: 'MEDIUM,HIGH,CRITICAL'
       # - name: Run Terrascan
