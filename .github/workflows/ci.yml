@@ -49,8 +49,8 @@ jobs:
 
       - name: Upload scanning result
         run: |
-            if[["$(cat results.sarif | jq '.runs[].results[]')" != "" ]]; then
-              cat results.sarif
+          if[[ "$(cat results.sarif | jq '.runs[].results[]')" != "" ]]; then
+            cat results.sarif
 
 
       # - name: Run Terrascan
