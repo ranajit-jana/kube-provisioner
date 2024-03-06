@@ -50,7 +50,7 @@ jobs:
       - name: Upload scanning result
         run: |
             if[["$(cat results.sarif | jq '.runs[].results[]')" != "" ]]; then
-            cat results.sarif
+              cat results.sarif
 
 
       # - name: Run Terrascan
