@@ -38,13 +38,20 @@ jobs:
         with:
           scan-type: 'config'
           hide-progress: false
-          format: 'sarif'
-          scan-ref: ./cloud/aws
-          output: 'trivy-results.sarif'
+          format: 'table'
           exit-code: '1'
-          ignore-unfixed: true
-          severity: 'CRITICAL,HIGH'
+          ignore-unfixed: false
+          severity: 'MEDIUM,HIGH,CRITICAL'
 
+      - name: Run Trivy vulnerability scanner in fs mode
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          hide-progress: false
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: false
+          severity: 'MEDIUM,HIGH,CRITICAL'
       # - name: Run Terrascan
       #   id: terrascan
       #   uses: tenable/terrascan-action@v1.5.0
