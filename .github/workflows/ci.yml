@@ -33,16 +33,27 @@ jobs:
         id: fmt
         run: terraform fmt -check
 
-      - name: Run Terrascan
-        id: terrascan
-        uses: tenable/terrascan-action@v1.5.0
+      - name: Run Trivy vulnerability scanner in IaC mode
+        uses: aquasecurity/trivy-action@master
         with:
-          iac_type: "terraform"
-          iac_version: "v14"
-          policy_type: "aws"
-          only_warn: true
-          iac_dir: cloud/aws
-          sarif_upload: true
+          scan-type: 'config'
+          hide-progress: false
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          exit-code: '1'
+          ignore-unfixed: true
+          severity: 'CRITICAL,HIGH'
+
+      # - name: Run Terrascan
+      #   id: terrascan
+      #   uses: tenable/terrascan-action@v1.5.0
+      #   with:
+      #     iac_type: "terraform"
+      #     iac_version: "v14"
+      #     policy_type: "aws"
+      #     only_warn: true
+      #     iac_dir: cloud/aws
+      #     sarif_upload: true
       # - name: Upload SARIF file
       #   uses: github/codeql-action/upload-sarif@v1
       #   with:
