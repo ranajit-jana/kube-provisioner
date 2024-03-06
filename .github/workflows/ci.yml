@@ -44,12 +44,12 @@ jobs:
           exit-code: '0'
           ignore-unfixed: true
           severity: 'MEDIUM,HIGH,CRITICAL'
-          output: 'trivy-results.sarif.json'
+          output: 'trivy-results.sarif'
 
       - name: Upload Trivy scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@v2
+        uses: github/codeql-action/upload-sarif@v3
         with:
-          sarif_file: 'trivy-results.sarif.json'
+          sarif_file: 'trivy-results.sarif'
 
       - name: Upload scanning result
         run: |
