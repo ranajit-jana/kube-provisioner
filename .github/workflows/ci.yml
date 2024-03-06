@@ -39,6 +39,7 @@ jobs:
           scan-type: 'config'
           hide-progress: false
           format: 'sarif'
+          scan-ref: cloud/aws
           output: 'trivy-results.sarif'
           exit-code: '1'
           ignore-unfixed: true
