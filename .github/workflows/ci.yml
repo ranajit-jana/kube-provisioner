@@ -43,11 +43,11 @@ jobs:
           exit-code: '0'
           ignore-unfixed: true
           severity: 'MEDIUM,HIGH,CRITICAL'
-          output: 'trivy-results.sarif'
+          output: 'trivy-results.sarif.json'
 
       - name: Upload scanning result
         run: |
-            cat trivy-results.sarif
+            cat trivy-results.sarif.json
 
 
       # - name: Run Terrascan
