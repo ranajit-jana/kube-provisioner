@@ -51,6 +51,7 @@ jobs:
         run: |
           if[[ "$(cat results.sarif | jq '.runs[].results[]')" != "" ]]; then
             cat results.sarif
+          fi
 
 
       # - name: Run Terrascan
