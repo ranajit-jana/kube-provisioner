@@ -46,6 +46,11 @@ jobs:
           severity: 'MEDIUM,HIGH,CRITICAL'
           output: 'trivy-results.sarif.json'
 
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: 'trivy-results.sarif.json'
+
       - name: Upload scanning result
         run: |
             cat trivy-results.sarif.json
