@@ -1,5 +1,5 @@
 locals {
-  root_account_arn = "arn:aws:iam::890504605381:root"
+  root_account_arn = "arn:aws:iam::471112573492:root"
   tags             = { "name" : "project" }
 }
 
@@ -121,6 +121,7 @@ resource "aws_eks_addon" "kubeproxy" {
   depends_on        = [module.eks_managed_node_group]
 }
 
+
 resource "kubernetes_config_map" "aws_auth" {
   metadata {
     name      = "aws-auth"
@@ -138,7 +139,7 @@ resource "kubernetes_config_map" "aws_auth" {
         ]
       },
       {
-        rolearn  = "arn:aws:iam::890504605381:role/terraformuser"
+        rolearn  = "arn:aws:iam::471112573492:role/terraformuser"
         username = "terraformuser"
         groups = [
           "system:masters"
@@ -147,7 +148,7 @@ resource "kubernetes_config_map" "aws_auth" {
     ])
     "mapUsers" = yamlencode([
       {
-        userarn  = "arn:aws:iam::890504605381:user/kubeuser"
+        userarn  = "arn:aws:iam::471112573492:user/kubeuser"
         username = "kubeuser"
         groups = [
           "system:masters"
