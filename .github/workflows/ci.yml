@@ -39,7 +39,8 @@ jobs:
           scan-type: 'config'
           hide-progress: false
           scan-ref: ./cloud/aws
-          format: 'table'
+          file-patterns: 'terraform:.*\*.tf:terraform:.*\.tfvars'
+          format: 'sarif'
           exit-code: '0'
           ignore-unfixed: true
           severity: 'MEDIUM,HIGH,CRITICAL'
