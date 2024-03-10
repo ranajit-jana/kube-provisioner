@@ -27,7 +27,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v2.0.0
         with:
           aws-region: us-east-1
-          role-to-assume: arn:aws:iam::890504605381:role/Deploy-with-OIDC
+          role-to-assume: arn:aws:iam::471112573492:role/DeploymentOIDC
           role-session-name: awssession
           mask-aws-account-id: false
 

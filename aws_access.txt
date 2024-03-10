@@ -4,7 +4,7 @@ aws eks register-cluster \
      --connector-config roleArn=arn:aws:iam::890504605381:role/eks-admin,provider="OTHER" 
 
 
-
+471112573492
 aws --version
 
 aws sts get-caller-identity

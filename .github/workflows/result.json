@@ -1,0 +1,35 @@
+{
+  "version": "2.1.0",
+  "$schema": "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "fullName": "Trivy Vulnerability Scanner",
+          "informationUri": "https://github.com/aquasecurity/trivy",
+          "name": "Trivy",
+          "rules": [
+            {
+              "id": "AVD-AWS-0130",
+              "name": "Misconfiguration",
+              "shortDescription": {
+                "text": "aws_instance should activate session tokens for Instance Metadata Service."
+              },
+              "fullDescription": {
+                "text": "\nIMDS v2 (Instance Metadata Service) introduced session authentication tokens which improve security when talking to IMDS.\nBy default \u0026lt;code\u0026gt;aws_instance\u0026lt;/code\u0026gt; resource sets IMDS session auth tokens to be optional. \nTo fully protect IMDS you need to enable session tokens by using \u0026lt;code\u0026gt;metadata_options\u0026lt;/code\u0026gt; block and its \u0026lt;code\u0026gt;http_tokens\u0026lt;/code\u0026gt; variable set to \u0026lt;code\u0026gt;required\u0026lt;/code\u0026gt;.\n"
+              },
+              "defaultConfiguration": {
+                "level": "error"
+              },
+              "helpUri": "https://avd.aquasec.com/misconfig/avd-aws-0130",
+              "help": {
+                "text": "Misconfiguration AVD-AWS-0130\nType: Terraform Security Check\nSeverity: HIGH\nCheck: aws_instance should activate session tokens for Instance Metadata Service.\nMessage: Launch template does not require IMDS access to require a token\nLink: [AVD-AWS-0130](https://avd.aquasec.com/misconfig/avd-aws-0130)\n\nIMDS v2 (Instance Metadata Service) introduced session authentication tokens which improve security when talking to IMDS.\nBy default \u003ccode\u003eaws_instance\u003c/code\u003e resource sets IMDS session auth tokens to be optional. \nTo fully protect IMDS you need to enable session tokens by using \u003ccode\u003emetadata_options\u003c/code\u003e block and its \u003ccode\u003ehttp_tokens\u003c/code\u003e variable set to \u003ccode\u003erequired\u003c/code\u003e.\n",
+                "markdown": "**Misconfiguration AVD-AWS-0130**\n| Type | Severity | Check | Message | Link |\n| --- | --- | --- | --- | --- |\n|Terraform Security Check|HIGH|aws_instance should activate session tokens for Instance Metadata Service.|Launch template does not require IMDS access to require a token|[AVD-AWS-0130](https://avd.aquasec.com/misconfig/avd-aws-0130)|\n\n\nIMDS v2 (Instance Metadata Service) introduced session authentication tokens which improve security when talking to IMDS.\nBy default \u003ccode\u003eaws_instance\u003c/code\u003e resource sets IMDS session auth tokens to be optional. \nTo fully protect IMDS you need to enable session tokens by using \u003ccode\u003emetadata_options\u003c/code\u003e block and its \u003ccode\u003ehttp_tokens\u003c/code\u003e variable set to \u003ccode\u003erequired\u003c/code\u003e.\n"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

@@ -6,7 +6,7 @@ metadata:
   # If using a dedicated IAM role for kube-bench, uncomment the annotations
   # block below and replace the ROLE_ARN
   annotations:
-    eks.amazonaws.com/role-arn: "arn:aws:iam::890504605381:role/kube_bench_security_hub_role-my-eks"
+    eks.amazonaws.com/role-arn: "arn:aws:iam::471112573492:role/kube_bench_security_hub_role-my-eks"
 
 ---
 apiVersion: v1
@@ -16,9 +16,9 @@ metadata:
   namespace: kube-bench
 data:
   config.yaml: |
-    AWS_ACCOUNT: "890504605381"
+    AWS_ACCOUNT: "471112573492"
     AWS_REGION: "us-east-1"
-    CLUSTER_ARN: "arn:aws:eks:us-east-1:890504605381:cluster/my-eks"
+    CLUSTER_ARN: "arn:aws:eks:us-east-1:471112573492:cluster/my-eks"
 
 ---
 apiVersion: batch/v1
@@ -33,7 +33,7 @@ spec:
       containers:
       - name: kube-bench
         # Push the image to your ECR and then refer to it here
-        image: 890504605381.dkr.ecr.us-east-1.amazonaws.com/k8s/kube-bench:latest
+        image: 471112573492.dkr.ecr.us-east-1.amazonaws.com/k8s/kube-bench:latest
         #image: docker.io/aquasec/kube-bench:latest
         command: ["kube-bench", "run", "--targets", "node", "--benchmark", "eks-1.2.0", "--asff"]
         env:
