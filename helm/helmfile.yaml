@@ -28,6 +28,10 @@ repositories:
 
 
 releases:
+- name: postee
+  chart: aqua/postee
+  version: 2.14.0
+
 
 - name: trivy-operator
   chart: aqua/trivy-operator
