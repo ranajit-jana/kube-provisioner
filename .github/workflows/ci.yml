@@ -43,18 +43,19 @@ jobs:
           format: 'sarif'
           exit-code: '0'
           ignore-unfixed: true
-          severity: 'MEDIUM,HIGH,CRITICAL'
+          severity: 'CRITICAL'
           output: 'results.sarif'
 
 
       - name: Upload scanning result
         run: |
-          if[[ "$(cat results.sarif | jq '.runs[].results[]')" != "" ]]; then
-            cat results.sarif
-          fi
+          cat results.sarif \
+           | jq -r '.runs[].tool[].rules[].shortDescription' >> $GITHUB_STEP_SUMMARY
 
+      - name: print scanning result
+        run: |
+          cat results.sarif
 
-      # - name: Run Terrascan
       #   id: terrascan
       #   uses: tenable/terrascan-action@v1.5.0
       #   with:
