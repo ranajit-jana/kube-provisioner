@@ -16,7 +16,7 @@ limitations under the License.
 
 terraform {
   backend "s3" {
-    bucket         = "tf-backend-project-reva"
+    bucket         = "tf-backend-reva"
     key            = "terraform.tfstate"
     region         = "eu-west-1"
     dynamodb_table = "reva_tf_lockid"
