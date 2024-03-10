@@ -16,6 +16,9 @@ limitations under the License.
 
 terraform {
   backend "s3" {
+    bucket  = "tf-backend-reva"
+    key     = "deployment/terraform.tfstate"
+    region  = "eu-west-1"
   }
 
   required_version = ">= 1.1.7"
