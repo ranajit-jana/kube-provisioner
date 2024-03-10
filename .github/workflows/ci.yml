@@ -50,7 +50,7 @@ jobs:
       - name: Upload scanning result
         run: |
           cat results.sarif \
-           | jq -r '.runs[].tool[].rules[].fullDescription.text' >> $GITHUB_STEP_SUMMARY
+           | jq -r '.runs[].tool[].rules[].fullDescription.text | join("\n\n")' >> $GITHUB_STEP_SUMMARY
 
       - name: print scanning result
         run: |
