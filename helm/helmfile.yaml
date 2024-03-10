@@ -15,6 +15,7 @@ helmDefaults:
   timeout: 600
   #recreatePods: true
   force: false
+  createNamespace: true
 
 commonLabels:
   system: argocd
@@ -25,8 +26,6 @@ repositories:
 - name: aqua
   url: https://aquasecurity.github.io/helm-charts/
 
-helmDefaults:
-  createNamespace: true
 
 releases:
 
