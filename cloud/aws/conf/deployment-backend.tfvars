@@ -1,6 +1,6 @@
 # backend.hcl
-bucket         = "deployment-env-state"
-region         = "ap-south-1"
-dynamodb_table = "deployment-env-state-lock"
+bucket         = "tf-backend-reva"
+region         = "eu-west-1"
+dynamodb_table = "reva_tf_lockid"
 encrypt        = true
 key            = "deployment/kube-provisioner.tfstate"
