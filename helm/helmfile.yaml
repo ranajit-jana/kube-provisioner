@@ -29,13 +29,12 @@ repositories:
 
 releases:
 - name: postee
-  chart: aqua/postee
-  version: 2.14.0
+  chart: ./postee
+  namespace: postee
 
 
 - name: trivy-operator
-  chart: aqua/trivy-operator
-  version: 0.20.6
+  chart: ./trivy-operator
   namespace: audit
   values:
     - ./values/trivyoperator-values.yaml
