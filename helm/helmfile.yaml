@@ -42,6 +42,7 @@ releases:
 
 - name: aquasecurity
   namespace: audit
+  createNamespace: true
   chart: ./aquasecurity
   values:
   - ./values/aquasecurity.yaml
