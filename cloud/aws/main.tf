@@ -122,48 +122,48 @@ resource "aws_eks_addon" "kubeproxy" {
 }
 
 
-resource "kubernetes_config_map" "aws_auth" {
-  metadata {
-    name      = "aws-auth"
-    namespace = "kube-system"
-  }
-  data = {
-    "mapAccounts" = yamlencode([])
-    "mapRoles" = yamlencode([
-      {
-        rolearn  = aws_iam_role.nodegroup_role.arn
-        username = "system:node:{{EC2PrivateDNSName}}"
-        groups = [
-          "system:bootstrappers",
-          "system:nodes",
-        ]
-      },
-      {
-        rolearn  = "arn:aws:iam::471112573492:role/terraformuser"
-        username = "terraformuser"
-        groups = [
-          "system:masters"
-        ]
-      },
-    ])
-    "mapUsers" = yamlencode([
-      {
-        userarn  = "arn:aws:iam::471112573492:user/kubeuser"
-        username = "kubeuser"
-        groups = [
-          "system:masters"
-        ]
-      },
-    ])
-  }
-  lifecycle {
-    ignore_changes = [
-      data,
-      metadata
-    ]
-  }
-  depends_on = [module.eks]
-}
+# resource "kubernetes_config_map" "aws_auth" {
+#   metadata {
+#     name      = "aws-auth"
+#     namespace = "kube-system"
+#   }
+#   data = {
+#     "mapAccounts" = yamlencode([])
+#     "mapRoles" = yamlencode([
+#       {
+#         rolearn  = aws_iam_role.nodegroup_role.arn
+#         username = "system:node:{{EC2PrivateDNSName}}"
+#         groups = [
+#           "system:bootstrappers",
+#           "system:nodes",
+#         ]
+#       },
+#       {
+#         rolearn  = "arn:aws:iam::471112573492:role/terraformuser"
+#         username = "terraformuser"
+#         groups = [
+#           "system:masters"
+#         ]
+#       },
+#     ])
+#     "mapUsers" = yamlencode([
+#       {
+#         userarn  = "arn:aws:iam::471112573492:user/kubeuser"
+#         username = "kubeuser"
+#         groups = [
+#           "system:masters"
+#         ]
+#       },
+#     ])
+#   }
+#   lifecycle {
+#     ignore_changes = [
+#       data,
+#       metadata
+#     ]
+#   }
+#   depends_on = [module.eks]
+# }
 
 resource "aws_iam_role" "nodegroup_role" {
   name               = "eks-nodegroup-nodegrouprole"
