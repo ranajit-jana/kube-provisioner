@@ -122,7 +122,7 @@ resource "aws_eks_addon" "kubeproxy" {
 }
 
 
-resource "kubernetes_config_map" "aws_auth" {
+resource "kubernetes_config_map" "aws_auth_new" {
   metadata {
     name      = "aws-auth"
     namespace = "kube-system"
