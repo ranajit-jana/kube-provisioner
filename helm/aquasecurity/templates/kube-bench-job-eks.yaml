@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: kube-bench
-  namespace: kube-bench
+  namespace: audit
   # If using a dedicated IAM role for kube-bench, uncomment the annotations
   # block below and replace the ROLE_ARN
   annotations:
@@ -13,7 +13,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: kube-bench-eks-config
-  namespace: kube-bench
+  namespace: audit
 data:
   config.yaml: |
     AWS_ACCOUNT: "471112573492"
@@ -25,7 +25,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: kube-bench
-  namespace: kube-bench
+  namespace: audit
 spec:
   template:
     spec:
