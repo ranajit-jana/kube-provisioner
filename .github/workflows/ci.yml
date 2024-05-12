@@ -33,47 +33,47 @@ jobs:
         id: fmt
         run: terraform fmt -check
 
-      - name: Run Trivy vulnerability scanner in IaC mode
-        uses: aquasecurity/trivy-action@master
+      # - name: Run Trivy vulnerability scanner in IaC mode
+      #   uses: aquasecurity/trivy-action@master
+      #   with:
+      #     scan-type: 'config'
+      #     hide-progress: false
+      #     scan-ref: ./cloud/aws
+      #     file-patterns: 'terraform:.*\*.tf:terraform:.*\.tfvars'
+      #     format: 'sarif'
+      #     exit-code: '0'
+      #     ignore-unfixed: true
+      #     severity: 'CRITICAL'
+      #     output: 'results.sarif'
+
+
+      # - name: Upload scanning result
+      #   run: |
+      #     cat results.sarif \
+      #      | jq -r '.runs[].tool[].rules[] | "* \(.id)  -  \t\(.fullDescription.text)\n\n"' >> $GITHUB_STEP_SUMMARY
+
+      # - name: print scanning result
+      #   run: |
+      #     cat results.sarif
+
+      # - name: Upload Trivy scan results to GitHub Security tab
+      #   uses: github/codeql-action/upload-sarif@v3
+      #   if: always()
+      #   with:
+      #     token: ${{ secrets.GITHUB_TOKEN }}
+      #     sarif_file: 'results.sarif'
+      #     category: trivy
+      - name: Terrascan
+        id: terrascan
+        uses: tenable/terrascan-action@v1.5.0
         with:
-          scan-type: 'config'
-          hide-progress: false
-          scan-ref: ./cloud/aws
-          file-patterns: 'terraform:.*\*.tf:terraform:.*\.tfvars'
-          format: 'sarif'
-          exit-code: '0'
-          ignore-unfixed: true
-          severity: 'CRITICAL'
-          output: 'results.sarif'
-
-
-      - name: Upload scanning result
-        run: |
-          cat results.sarif \
-           | jq -r '.runs[].tool[].rules[] | "* \(.id)  -  \t\(.fullDescription.text)\n\n"' >> $GITHUB_STEP_SUMMARY
-
-      - name: print scanning result
-        run: |
-          cat results.sarif
-
-      - name: Upload Trivy scan results to GitHub Security tab
+          iac_type: "terraform"
+          iac_version: "v14"
+          policy_type: "aws"
+          only_warn: true
+          iac_dir: cloud/aws
+          sarif_upload: true
+      - name: Upload SARIF file
         uses: github/codeql-action/upload-sarif@v3
-        if: always()
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          sarif_file: 'results.sarif'
-          category: trivy
-      
-      #   id: terrascan
-      #   uses: tenable/terrascan-action@v1.5.0
-      #   with:
-      #     iac_type: "terraform"
-      #     iac_version: "v14"
-      #     policy_type: "aws"
-      #     only_warn: true
-      #     iac_dir: cloud/aws
-      #     sarif_upload: true
-      # - name: Upload SARIF file
-      #   uses: github/codeql-action/upload-sarif@v1
-      #   with:
-      #       sarif_file: terrascan.sarif
+            sarif_file: terrascan.sarif
