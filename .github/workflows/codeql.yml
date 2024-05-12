@@ -43,7 +43,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: [ 'HCL' ]
+        language: [ 'python' ]
       # matrix:
       #   include:
 
