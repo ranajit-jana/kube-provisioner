@@ -26,7 +26,8 @@ docker login -u AWS -p $(aws ecr get-login-password --region us-east-1) 47111257
 And
 
 
-docker tag e9ae3c220b23 aws_account_id.dkr.ecr.us-west-2.amazonaws.com/my-repository:tag
+docker tag 98d497e9284b 471112573492.dkr.ecr.us-east-1.amazonaws.com/k8s/kube-bench:0.0.1
+docker push 471112573492.dkr.ecr.us-east-1.amazonaws.com/k8s/kube-bench:0.0.1
 
 aws sts get-caller-identity
 
@@ -37,3 +38,5 @@ docker login -u kubeuser https://471112573492.dkr.ecr.us-east-1.amazonaws.com/
 service docker stop
 rm ~/.docker/config.json
 service docker start
+
+Added to test
