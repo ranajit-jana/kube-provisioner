@@ -41,6 +41,7 @@ jobs:
           scan-ref: ./cloud/aws
           file-patterns: 'terraform:.*\*.tf:terraform:.*\.tfvars'
           format: 'sarif'
+          # exit code will be 1 if we want to fail this workflow
           exit-code: '0'
           ignore-unfixed: true
           severity: 'CRITICAL'
@@ -48,6 +49,7 @@ jobs:
 
 
       - name: Upload scanning result
+        if: always()
         run: |
           cat results.sarif \
            | jq -r '.runs[].tool[].rules[] | "* \(.id)  -  \t\(.fullDescription.text)\n\n"' >> $GITHUB_STEP_SUMMARY
@@ -60,10 +62,9 @@ jobs:
         uses: github/codeql-action/upload-sarif@v3
         if: always()
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
           sarif_file: 'results.sarif'
           category: trivy
-      
+      # - name: Terrascan
       #   id: terrascan
       #   uses: tenable/terrascan-action@v1.5.0
       #   with:
@@ -74,6 +75,7 @@ jobs:
       #     iac_dir: cloud/aws
       #     sarif_upload: true
       # - name: Upload SARIF file
-      #   uses: github/codeql-action/upload-sarif@v1
+      #   uses: github/codeql-action/upload-sarif@v3
       #   with:
+      #       token: ${{ secrets.GITHUB_TOKEN }}
       #       sarif_file: terrascan.sarif
