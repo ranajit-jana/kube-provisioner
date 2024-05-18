@@ -1,1 +1,36 @@
-testing the flow
+
+{
+  "Version": "2012-10-17",
+  "Statements": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "{ProductAccountId}"
+      },
+      "Action": [
+        "securityhub:BatchImportFindings"
+      ],
+      "Resource": "{ProductArn}",
+      "Condition": {
+        "StringEquals": {
+          "securityhub:TargetAccount": "{CustomerAccountId}"
+        }
+      }
+    },
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "{ProductAccountId}"
+      },
+      "Action": [
+        "securityhub:BatchImportFindings"
+      ],
+      "Resource": "{ProductSubscriptionArn}",
+      "Condition": {
+        "StringEquals": {
+          "securityhub:TargetAccount": "{CustomerAccountId}"
+        }
+      }
+    }
+  ]
+}
