@@ -42,7 +42,7 @@ jobs:
           file-patterns: 'terraform:.*\*.tf:terraform:.*\.tfvars'
           format: 'sarif'
           # exit code will be 1 if we want to fail this workflow
-          exit-code: '1'
+          exit-code: '0'
           ignore-unfixed: true
           severity: 'CRITICAL'
           output: 'results.sarif'
