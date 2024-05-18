@@ -13,4 +13,5 @@ spec:
         image: aquasec/kube-hunter:0.6.8
         command: ["kube-hunter"]
         #        args: ["--report json"]
+        args: ["--pod"]
       restartPolicy: Never
