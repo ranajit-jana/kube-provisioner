@@ -16,7 +16,7 @@ limitations under the License.
 
 cluster_name    = "my-eks"
 cluster_region  = "us-east-1"
-cluster_version = "1.24"
+cluster_version = "1.27"
 
 vpc_cidr                  = "10.0.0.0/16"
 vpc_secondary_cidr_blocks = ["10.1.0.0/16", "10.2.0.0/16"]

@@ -63,4 +63,5 @@ jobs:
         run: |
           #echo "kubeoutput : ${{ steps.tf_deploy.outputs.reva_cluster_name }}"
           aws eks --region us-east-1 update-kubeconfig --name my-eks
+          kubectl create namespace kube-bench
           helmfile sync
