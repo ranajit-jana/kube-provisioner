@@ -38,5 +38,3 @@ docker login -u kubeuser https://471112573492.dkr.ecr.us-east-1.amazonaws.com/
 service docker stop
 rm ~/.docker/config.json
 service docker start
-
-Added to test
