@@ -39,5 +39,3 @@ service docker stop
 rm ~/.docker/config.json
 service docker start
 
-Added to test
-added to test
