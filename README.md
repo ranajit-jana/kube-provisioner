@@ -34,6 +34,8 @@ aws sts get-caller-identity
 
 docker login -u kubeuser https://471112573492.dkr.ecr.us-east-1.amazonaws.com/
 
+Test addition
+
 
 service docker stop
 rm ~/.docker/config.json
